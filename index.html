@@ -19,6 +19,7 @@
 <meta name="theme-color" content="#1B0B3A">
 <meta name="format-detection" content="telephone=no">
 <meta name="robots" content="noindex">
+<meta name="hackathon-wrapped-build" content="2.1">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Hackathon Wrapped | Tafa3ul Edition">
 <meta property="og:description" content="10 Questions. 1 Personality. Unlimited Chaos.">
@@ -287,6 +288,7 @@ main { position: relative; z-index: 1; }
 .landing__cta { margin-top: auto; padding-top: 10px; }
 .landing__cta .btn { min-height: 64px; font-size: 1.125rem; }
 .note { margin-top: 16px; font-size: .8125rem; text-align: center; opacity: .8; }
+.build { margin-left: .5em; white-space: nowrap; opacity: .75; }   /* version label, e.g. v2.1 */
 
 .marquee {
   margin: 6px calc(var(--gutter) * -1) calc(-22px - env(safe-area-inset-bottom, 0px));
@@ -603,14 +605,14 @@ main { position: relative; z-index: 1; }
       </h1>
       <p class="sticker sticker--edition">Tafa3ul Edition</p>
     </div>
-    <p class="landing__tagline"><span>10 Questions.</span> <span>1 Personality.</span> <span>Unlimited Chaos.</span></p>
+    <p class="landing__tagline"><span><span data-qcount>10</span> Questions.</span> <span>1 Personality.</span> <span>Unlimited Chaos.</span></p>
     <div class="landing__copy" lang="ar" dir="rtl">
       <p class="lead">كل واحد بالهاكاثون عنده شخصية... وبعض الشخصيات المفروض ما نخليها تقرّب من الـDeadline.</p>
-      <p class="sub">جاوب على 10 أسئلة واكتشف شنو نوعك الحقيقي من ورا الكواليس.</p>
+      <p class="sub">جاوب على <span data-qcount>10</span> أسئلة واكتشف شنو نوعك الحقيقي من ورا الكواليس.</p>
     </div>
     <div class="landing__cta">
       <button class="btn btn--block" id="startBtn" type="button">Expose My Personality <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
-      <p class="note">100% for fun. 0% scientifically approved.</p>
+      <p class="note">100% for fun. 0% scientifically approved. <span class="build" id="buildTag"></span></p>
     </div>
     <div class="marquee" aria-hidden="true"><div class="marquee__track" id="marquee"></div></div>
   </section>
@@ -620,7 +622,7 @@ main { position: relative; z-index: 1; }
     <div><button class="link-btn" id="introBack" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>Back</button></div>
     <h2 class="intro__title" id="introTitle" lang="ar" dir="rtl" tabindex="-1">جاهز تعرف شنو نوع الكارثة اللي تمثلها بالهاكاثون؟</h2>
     <div class="intro__sub">
-      <p lang="ar" dir="rtl">10 أسئلة ونكشف حقيقتك.</p>
+      <p lang="ar" dir="rtl"><span data-qcount>10</span> أسئلة ونكشف حقيقتك.</p>
       <p>No pressure. Actually, a little pressure.</p>
     </div>
     <form class="form" id="introForm" novalidate autocomplete="off">
@@ -643,7 +645,7 @@ main { position: relative; z-index: 1; }
   <section class="screen quiz" id="screen-quiz" data-screen="quiz" aria-label="Personality quiz" hidden>
     <div class="quiz__bar">
       <button class="link-btn" id="quizBack" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>Back</button>
-      <div class="progress" id="progress" role="progressbar" aria-label="Quiz progress" aria-valuemin="1" aria-valuemax="10" aria-valuenow="1"></div>
+      <div class="progress" id="progress" role="progressbar" aria-label="Quiz progress" aria-valuemin="1" aria-valuenow="1"></div>
     </div>
     <div class="q" id="quizStage"></div>
     <p class="signoff"><i class="motif" aria-hidden="true"></i><span>Tafa3ul Group Internal Hackathon</span><i class="motif" aria-hidden="true"></i></p>
@@ -772,6 +774,14 @@ main { position: relative; z-index: 1; }
   var NICK_MAX = 18;            // max nickname length
   var TEAM_MAX = 24;            // max team-name length
   var STORAGE_KEY = 'hackathon-wrapped-tafa3ul-v2';
+  // Saved sessions from earlier versions of the site (the 5-question quiz). They are deleted on sight.
+  var LEGACY_STORAGE_KEYS = ['hackathon-wrapped-tafa3ul-v1'];
+  // QUIZ VERSION CHECK. Progress saved in the browser is only restored when it was saved by this exact quiz.
+  // A fingerprint of the questions and answers is built automatically, so editing them resets old sessions by itself.
+  // Raise QUIZ_VERSION only if you ever want to force every saved session to restart for another reason.
+  var QUIZ_VERSION = 2;
+  // BUILD is printed in small type on the landing page, so you can see at a glance which version a browser is showing.
+  var BUILD = '2.1';
   // Invisible left-to-right mark: keeps a final "." attached to an English sentence at the end of an Arabic line.
   var LRM = String.fromCharCode(0x200E);
 
@@ -1185,7 +1195,7 @@ main { position: relative; z-index: 1; }
      by question, because the order is shuffled).
      ------------------------------------------------------------------ */
   var COPY = {
-    marquee: ['Tafa3ul Group internal hackathon', 'Your hackathon personality is about to be exposed', 'No pressure', 'Actually, a little pressure', '10 questions', '8 personalities', 'Zero science'],
+    marquee: ['Tafa3ul Group internal hackathon', 'Your hackathon personality is about to be exposed', 'No pressure', 'Actually, a little pressure', '{n} questions', '8 personalities', 'Zero science'],   // {n} = number of questions
     heckles: [
       'ماكو جواب غلط. بس أكو أجوبة تفضح.',
       'لا تفكر هواي، مو امتحان وزاري.',
@@ -1515,6 +1525,15 @@ main { position: relative; z-index: 1; }
      answers one entry per question, indexed by question (not by position)
      pos     where the participant is in `order`
      ------------------------------------------------------------------ */
+  // Fingerprint of this quiz: version, number of questions, and a hash of every question, answer and weight.
+  var QUIZ_SIGNATURE = (function () {
+    var src = QUESTIONS.map(function (q) {
+      return q.text + '|' + q.answers.map(function (a) { return a.text + JSON.stringify(a.traits); }).join('|');
+    }).join('||');
+    var h = 2166136261;
+    for (var i = 0; i < src.length; i++) { h ^= src.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return QUIZ_VERSION + '.' + QUESTIONS.length + '.' + h.toString(36);
+  })();
   function blankAnswers() { return QUESTIONS.map(function () { return null; }); }
   var state = { screen: 'landing', nick: '', team: '', order: null, lastOrder: null, answers: blankAnswers(), pos: 0, muted: false, result: null };
 
@@ -1550,28 +1569,41 @@ main { position: relative; z-index: 1; }
 
   function save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ v: 2, screen: state.screen, nick: state.nick, team: state.team, order: state.order, lastOrder: state.lastOrder, answers: state.answers, pos: state.pos, muted: state.muted }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ v: 2, quiz: QUIZ_SIGNATURE, screen: state.screen, nick: state.nick, team: state.team, order: state.order, lastOrder: state.lastOrder, answers: state.answers, pos: state.pos, muted: state.muted }));
     } catch (e) { /* private mode or storage disabled: the quiz still works */ }
   }
   function load() {
+    var d = null, legacy = null;
     try {
-      var d = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-      if (!d || d.v !== 2) return;
-      state.nick = cleanText(d.nick, NICK_MAX);
-      state.team = cleanText(d.team, TEAM_MAX);
-      state.muted = !!d.muted;
-      if (isValidOrder(d.lastOrder)) state.lastOrder = d.lastOrder;
-      if (isValidOrder(d.order)) {
-        state.order = d.order;
-        if (Array.isArray(d.answers) && d.answers.length === QUESTIONS.length) {
-          state.answers = d.answers.map(function (a) { return (a === 0 || a === 1 || a === 2 || a === 3) ? a : null; });
-        }
-        state.pos = clamp(d.pos | 0, 0, QUESTIONS.length - 1);
-        state.savedScreen = d.screen;
-      } else if (d.screen === 'intro') {
-        state.savedScreen = 'intro';
-      }
-    } catch (e) { /* ignore corrupted data */ }
+      // 1. Sessions from older versions of the site are removed. Only the name and sound setting are carried over.
+      LEGACY_STORAGE_KEYS.forEach(function (key) {
+        var raw = localStorage.getItem(key);
+        if (raw === null) return;
+        try { legacy = legacy || JSON.parse(raw); } catch (e) { /* unreadable: just drop it */ }
+        localStorage.removeItem(key);
+      });
+      d = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    } catch (e) { d = null; }
+    if (!d || typeof d !== 'object') d = null;
+    if (!legacy || typeof legacy !== 'object') legacy = null;
+    var kept = d || legacy;
+    if (!kept) return;                                           // first visit: nothing saved, nothing to check
+    state.nick = cleanText(kept.nick, NICK_MAX);
+    state.team = cleanText(kept.team, TEAM_MAX);
+    state.muted = !!kept.muted;
+    // 2. Quiz version check: anything not saved by this exact quiz (old 5-question data, an edited question set,
+    //    a damaged record) is reset to a fresh start and overwritten straight away.
+    if (!d || d.v !== 2 || d.quiz !== QUIZ_SIGNATURE) { state.outdatedSessionReset = true; save(); return; }
+    // 3. Same quiz: restore progress, but only if the saved shape is intact (all questions, each exactly once).
+    if (isValidOrder(d.lastOrder)) state.lastOrder = d.lastOrder;
+    if (isValidOrder(d.order) && Array.isArray(d.answers) && d.answers.length === QUESTIONS.length) {
+      state.order = d.order;
+      state.answers = d.answers.map(function (a) { return (a === 0 || a === 1 || a === 2 || a === 3) ? a : null; });
+      state.pos = clamp(d.pos | 0, 0, QUESTIONS.length - 1);
+      state.savedScreen = d.screen;
+    } else if (d.screen === 'intro') {
+      state.savedScreen = 'intro';
+    }
   }
   function cleanText(v, max) {
     return String(v == null ? '' : v).replace(/[\x00-\x1F\x7F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
@@ -2986,9 +3018,12 @@ main { position: relative; z-index: 1; }
       document.body.classList.add('is-party'); setTimeout(function () { document.body.classList.remove('is-party'); }, 2400);
     });
 
+    // Every place that mentions how many questions there are reads it from the QUESTIONS array.
+    Array.prototype.forEach.call(document.querySelectorAll('[data-qcount]'), function (el) { el.textContent = QUESTIONS.length; });
+    $('buildTag').textContent = 'v' + BUILD;
     var track = $('marquee');
     for (var rep = 0; rep < 2; rep++) COPY.marquee.forEach(function (t) {
-      var s = document.createElement('span'); s.textContent = t.toUpperCase(); track.appendChild(s); track.appendChild(document.createElement('i'));
+      var s = document.createElement('span'); s.textContent = t.replace('{n}', QUESTIONS.length).toUpperCase(); track.appendChild(s); track.appendChild(document.createElement('i'));
     });
 
     $('startBtn').addEventListener('click', function () { if (navLock) return; Sound.tap(); show('intro'); });
@@ -3211,6 +3246,17 @@ main { position: relative; z-index: 1; }
   // Public handle: boot() is called by the assets script; the rest is for developers.
   window.HackathonWrapped = {
     boot: boot, test: runSelfTest, audit: runCardAudit, score: computeResult, profile: buildProfile,
+    // Facts about the quiz inside this file: HackathonWrapped.info()
+    info: function () {
+      var distinct = function (list) { var seen = {}; list.forEach(function (t) { seen[t] = 1; }); return Object.keys(seen).length; };
+      return {
+        build: BUILD, quizVersion: QUIZ_VERSION, quizSignature: QUIZ_SIGNATURE,
+        questions: QUESTIONS.length, uniqueQuestions: distinct(QUESTIONS.map(function (q) { return q.text; })),
+        answersPerQuestion: QUESTIONS.map(function (q) { return q.answers.length; }),
+        uniqueAnswers: distinct([].concat.apply([], QUESTIONS.map(function (q) { return q.answers.map(function (a) { return a.text; }); }))),
+        outdatedSessionWasReset: !!state.outdatedSessionReset
+      };
+    },
     dev: {
       findAnswers: findAnswers,
       order: function () { return state.order ? state.order.slice() : null; },
