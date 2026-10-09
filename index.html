@@ -10,18 +10,18 @@
     first script       EDIT HERE: logo path, questions, personalities, copy
     second script      embedded fonts + logo fallback (long base64 lines, leave as is)
 -->
-<html lang="en" dir="ltr" class="is-booting">
+<html lang="en" dir="ltr" class="is-booting" data-screen="landing">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hackathon Wrapped | Tafa3ul Edition</title>
-<meta name="description" content="5 Questions. 1 Personality. Unlimited Chaos. Find out which hackathon personality you are.">
+<meta name="description" content="10 Questions. 1 Personality. Unlimited Chaos. The Tafa3ul Group internal hackathon personality quiz.">
 <meta name="theme-color" content="#1B0B3A">
 <meta name="format-detection" content="telephone=no">
 <meta name="robots" content="noindex">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Hackathon Wrapped | Tafa3ul Edition">
-<meta property="og:description" content="5 Questions. 1 Personality. Unlimited Chaos.">
+<meta property="og:description" content="10 Questions. 1 Personality. Unlimited Chaos.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231B0B3A'/%3E%3Ccircle cx='24' cy='36' r='14' fill='%23C8FF2E'/%3E%3Ccircle cx='45' cy='21' r='8' fill='%23FF3D9A'/%3E%3C/svg%3E">
 <style>
 /* =====================================================================
@@ -45,6 +45,8 @@
   --coral: #FF5C7A;
   --mint: #1FD6B4;
   --white: #FFFFFF;
+  --brand-ink: #262933;    /* the logo's charcoal */
+  --brand-grey: #8B8FA0;   /* the logo's grey */
 
   /* Live theme slots. JavaScript swaps these per screen / question / personality. */
   --bg: var(--ink);
@@ -147,17 +149,48 @@ body.is-party .bg__shape svg { animation-duration: .5s; }
   pointer-events: none;
 }
 .topbar > * { pointer-events: auto; }
-.logo-chip {
-  display: flex; align-items: center;
-  height: 40px; padding: 0 14px;
+/* Brand lockup: the official logo on a white plate beside the event name. Same place on every screen. */
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  height: 44px; padding: 0 16px 0 14px;
   background: var(--white); border-radius: 999px;
-  box-shadow: 0 0 0 2px var(--ink), 0 4px 0 2px var(--ink);
-  transform: rotate(-2deg);
+  box-shadow: 0 0 0 2px var(--brand-ink), 0 4px 0 2px var(--brand-ink);
+  transform: rotate(-1.5deg); transform-origin: left center;
   transition: transform .2s var(--ease-spring);
   user-select: none; -webkit-user-select: none;
 }
-.logo-chip img { height: 17px; width: auto; }
-.logo-chip.is-bump { transform: rotate(3deg) scale(1.08); }
+.brand img { height: 17px; width: auto; }
+.brand__sep { flex: none; width: 2px; height: 22px; border-radius: 2px; background: var(--brand-grey); }
+.brand__txt { font-weight: 800; font-size: .6875rem; line-height: 1.15; color: var(--brand-ink); white-space: nowrap; }
+.brand.is-bump { transform: rotate(2deg) scale(1.06); }
+/* Larger on the landing page, where the brand introduces the event. */
+html[data-screen="landing"] .brand { height: clamp(48px, 13.4vw, 54px); padding: 0 18px 0 16px; gap: 11px; }
+html[data-screen="landing"] .brand img { height: clamp(17px, 5vw, 22px); }
+html[data-screen="landing"] .brand__sep { height: 26px; }
+html[data-screen="landing"] .brand__txt { font-size: clamp(.6875rem, 3.1vw, .8125rem); }
+
+@media (max-width: 350px) {
+  .brand, html[data-screen="landing"] .brand { padding: 0 12px; gap: 8px; }
+  html[data-screen="landing"] .brand img { height: 16px; }
+}
+
+/* Brand motif: the logo's rhythm (dot, fused pair) as a strip. The script builds the shape; the colour is the element's own. */
+.motif {
+  display: block; height: 10px; background: currentColor;
+  -webkit-mask: var(--motif) repeat-x left center / auto 100%;
+          mask: var(--motif) repeat-x left center / auto 100%;
+  /* "round" fits a whole number of motifs into the strip, so none is cut off at the end */
+  -webkit-mask-repeat: round no-repeat;
+          mask-repeat: round no-repeat;
+}
+/* Small brand line at the foot of the form, quiz and reveal screens. */
+.signoff { display: flex; align-items: center; gap: 12px; margin-top: 16px; font-size: .75rem; font-weight: 800; white-space: nowrap; opacity: .85; }
+.signoff .motif { flex: 1; min-width: 0; height: 8px; opacity: .6; }
+.signoff .motif:last-child { -webkit-mask-position: right center; mask-position: right center; }
+.intro .signoff { margin-top: auto; padding-top: 22px; }
+.reveal .signoff { align-self: stretch; margin-top: auto; }
+.reveal > :first-child { margin-top: auto; }
+
 .icon-btn {
   width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%;
   display: grid; place-items: center;
@@ -297,7 +330,7 @@ main { position: relative; z-index: 1; }
 /* ---------- 9. QUIZ ---------- */
 .quiz { gap: 10px; max-width: calc(860px + var(--gutter) * 2); }
 .quiz__bar { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
-.progress { width: 148px; }
+.progress { width: 212px; max-width: 66%; }
 .progress svg { width: 100%; height: auto; overflow: visible; }
 .progress .p-off { fill: none; stroke: var(--fg); stroke-width: 2.5; opacity: .5; }
 .progress .p-on { fill: var(--fg); }
@@ -346,7 +379,7 @@ main { position: relative; z-index: 1; }
 .q__next { min-height: 46px; font-size: .9375rem; padding: 0 1.2em; }
 
 /* ---------- 10. REVEAL ---------- */
-.reveal { align-items: flex-start; justify-content: center; gap: 22px; }
+.reveal { align-items: flex-start; justify-content: flex-start; gap: 22px; }
 .reveal__dots { width: 132px; color: var(--lime); }
 .reveal__dots svg { width: 100%; height: auto; overflow: visible; }
 .reveal__pct { font: 900 clamp(5.5rem, 34vw, 13rem)/.8 var(--font-display); font-variation-settings: "wdth" 50; color: var(--cream); white-space: nowrap; }
@@ -360,10 +393,11 @@ main { position: relative; z-index: 1; }
 .wipe.is-fading { opacity: 0; transition: opacity .35s linear; }
 
 /* ---------- 11. RESULT ---------- */
-.result { gap: 0; padding-top: 0; padding-bottom: 0; max-width: calc(1120px + var(--gutter) * 2); }
+.result { gap: 0; padding-bottom: 0; max-width: calc(1120px + var(--gutter) * 2); }
 .result__main { display: flex; flex-direction: column; }
-.result__art { width: calc(100% + var(--gutter) * 2); max-width: none; margin: 0 calc(var(--gutter) * -1); aspect-ratio: 1080 / 620; height: auto; }
-.result__hero { position: relative; margin-top: -26px; display: flex; flex-direction: column; align-items: flex-start; }
+/* Hero: a framed panel. Only its background pattern touches the frame; the emblem and stickers sit inside with room to spare. */
+.result__art { width: 100%; height: auto; aspect-ratio: 1080 / 620; border-radius: 24px; border: 3px solid var(--fg); }
+.result__hero { position: relative; margin-top: 18px; display: flex; flex-direction: column; align-items: flex-start; }
 .result .sticker--rarity { transform: rotate(-3deg); font-size: .8125rem; }
 .result.is-active .sticker--rarity { animation: stamp .45s .15s var(--ease-spring) backwards; }
 .result__who { margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; max-width: 100%; }
@@ -373,6 +407,13 @@ main { position: relative; z-index: 1; }
 /* Title lockup: every line the same height, each stretched to fill the row. */
 .lockup { width: 100%; margin-top: 10px; color: var(--title); font: 900 80px/.78 var(--font-display); text-transform: uppercase; white-space: nowrap; padding-top: .06em; }
 .lockup__line { display: block; width: max-content; transform-origin: left center; font-variation-settings: "wdth" 50; }
+.edition {
+  margin-top: 16px; padding: .52em 1em .46em; border-radius: 999px;
+  background: var(--accent); color: var(--ink);
+  font: 900 .875rem/1 var(--font-display); font-variation-settings: "wdth" 118; text-transform: uppercase; white-space: nowrap;
+  box-shadow: 0 0 0 2px var(--ink), 0 4px 0 2px var(--ink);
+  transform: rotate(-1.5deg);
+}
 .result__tagline { margin-top: 18px; width: 100%; font-weight: 800; font-size: clamp(1.125rem, 5vw, 1.5rem); line-height: 1.4; text-align: start; }
 
 .result__stats { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 26px; }
@@ -382,14 +423,26 @@ main { position: relative; z-index: 1; }
 .meter .m-off { fill: none; stroke: var(--fg); stroke-width: 2; opacity: .45; }
 .meter .m-on { fill: var(--title); }
 
-.result__desc { margin-top: 30px; text-align: right; font-size: 1.0625rem; line-height: 1.95; }
+/* Personal story: opening, receipts from the participant's own answers, closing twist */
+.story { margin-top: 30px; text-align: right; }
+.story__intro { font-size: 1.125rem; font-weight: 800; line-height: 1.8; }
+.story__label { margin-top: 20px; font-size: .8125rem; font-weight: 800; opacity: .85; }
+.story__receipts { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+.story__receipts li { position: relative; padding: 11px 40px 11px 16px; border-radius: 18px; box-shadow: inset 0 0 0 2.5px var(--fg); font-size: 1rem; line-height: 1.7; }
+.story__receipts li::before { content: ""; position: absolute; right: 16px; top: 1.2em; width: 12px; height: 12px; border-radius: 50%; background: var(--title); }
+.story__twist { margin-top: 16px; font-size: 1.0625rem; line-height: 1.9; }
+.roast { margin-top: 26px; padding: 18px 20px 20px; border-radius: 26px; background: var(--fg); color: var(--bg); transition: background-color .4s linear, color .4s linear; }
+.roast__label { font-size: .8125rem; font-weight: 800; }
+.roast__text { margin-top: 4px; text-align: right; font-weight: 900; font-size: clamp(1.25rem, 5.6vw, 1.625rem); line-height: 1.65; }
 .traits { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 26px; padding-top: 20px; border-top: 2.5px solid var(--fg); }
 .traits dt { font-size: .8125rem; opacity: .85; }
 .traits dd { margin-top: 4px; font-weight: 900; font-size: 1.125rem; line-height: 1.3; }
+.traits .traits__plus { margin-top: 3px; font-weight: 800; font-size: .875rem; opacity: .9; }
 
 .result__card { margin-top: 44px; }
 .result__card h3 { font-weight: 900; font-size: 1.375rem; line-height: 1.2; }
 .result__card-sub { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 4px; font-size: .875rem; }
+.result__layout { margin-top: 6px; font-size: .8125rem; font-weight: 800; }
 .card-preview {
   display: block; width: min(74%, 330px); margin: 26px auto 10px; padding: 0; border: 0; border-radius: 18px; cursor: pointer;
   background: rgba(0, 0, 0, .14); aspect-ratio: 9 / 16; overflow: hidden;
@@ -412,12 +465,21 @@ main { position: relative; z-index: 1; }
 .actions::before { content: ""; position: absolute; left: 0; right: 0; top: -22px; height: 22px; pointer-events: none; background: linear-gradient(to top, var(--bg), transparent); }
 .actions .btn { min-height: 56px; padding: 0 .7em; font-size: .875rem; gap: .5em; }
 @media (min-width: 380px) { .actions .btn { font-size: .9375rem; padding: 0 .8em; } }
-.result__hint { margin-top: 2px; font-size: .8125rem; text-align: center; opacity: .85; }
+.result__hint { margin-top: 18px; font-size: .8125rem; text-align: center; opacity: .85; }
 .result__again { margin-top: 34px; display: grid; gap: 14px; }
 .result__again p { text-align: right; font-size: .9375rem; }
-.result__foot { margin-top: 40px; padding: 22px 0 calc(26px + env(safe-area-inset-bottom, 0px)); border-top: 2.5px solid var(--fg); display: grid; gap: 10px; font-size: .8125rem; }
-.result__foot [lang="ar"] { text-align: right; font-weight: 800; font-size: .9375rem; }
-.result__foot-row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; opacity: .85; }
+/* Branded footer: the logo on its white plate, the motif, and who made this */
+.result__foot { margin-top: 40px; padding: 22px 0 calc(28px + env(safe-area-inset-bottom, 0px)); border-top: 2.5px solid var(--fg); display: grid; gap: 18px; }
+.result__foot-line { text-align: right; font-weight: 800; font-size: .9375rem; }
+.brandfoot {
+  display: grid; justify-items: start; gap: 10px; padding: 20px;
+  border-radius: 26px; background: var(--white); color: var(--brand-ink);
+  box-shadow: 0 0 0 2.5px var(--brand-ink), 0 6px 0 2.5px var(--brand-ink);
+}
+.brandfoot__logo { height: 26px; width: auto; }
+.brandfoot .motif { width: 100%; height: 8px; color: var(--brand-grey); }
+.brandfoot__by { font-weight: 900; font-size: 1.0625rem; }
+.brandfoot__note { font-size: .8125rem; }
 
 /* ---------- 12. OVERLAYS ---------- */
 .fx { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9; pointer-events: none; }
@@ -450,8 +512,11 @@ main { position: relative; z-index: 1; }
 /* ---------- 13. LARGER SCREENS ---------- */
 @media (min-width: 720px) {
   :root { --gutter: 40px; --topbar-h: 76px; }
-  .logo-chip { height: 46px; padding: 0 18px; }
-  .logo-chip img { height: 20px; }
+  .brand { height: 48px; }
+  .brand img { height: 19px; }
+  html[data-screen="landing"] .brand { height: 60px; }
+  html[data-screen="landing"] .brand img { height: 25px; }
+  .signoff { font-size: .8125rem; }
   .q__answers { grid-template-columns: 1fr 1fr; gap: 16px; }
   .q__foot { margin-top: 26px; }
   .q__heckle { font-size: 1rem; }
@@ -476,7 +541,11 @@ main { position: relative; z-index: 1; }
 
   .result { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); grid-template-rows: auto auto 1fr auto; column-gap: 64px; align-items: start; padding-top: calc(var(--topbar-h) + 8px); }
   .result__main { grid-column: 1; grid-row: 1 / span 3; }
-  .result__art { width: 100%; margin: 0; border-radius: 28px; border: 3px solid var(--fg); }
+  .result__art { border-radius: 28px; }
+  .brandfoot { grid-template-columns: auto 1fr; align-items: center; column-gap: 20px; }
+  .brandfoot .motif { grid-column: 1 / -1; }
+  .brandfoot__by { grid-column: 1; }
+  .brandfoot__note { grid-column: 2; justify-self: end; }
   .result__card { grid-column: 2; grid-row: 1; margin-top: 0; }
   .card-preview { width: min(78%, 330px); margin-top: 22px; }
   .actions { grid-column: 2; grid-row: 2; position: static; margin: 22px 0 0; padding: 0; grid-template-columns: 1fr; background: none; }
@@ -509,8 +578,13 @@ main { position: relative; z-index: 1; }
 </div>
 
 <header class="topbar">
-  <!-- LOGO: the official file, untouched. Change the path in the script (LOGO_SRC). -->
-  <div class="logo-chip" id="logoChip"><img id="logoImg" src="assets/tafa3ul-logo.png" alt="Tafa3ul Group" width="1432" height="198"></div>
+  <!-- BRAND LOCKUP: the official logo file, untouched, beside the event name. It stays on every screen.
+       Change the logo path in the script (LOGO_SRC). -->
+  <div class="brand" id="logoChip">
+    <img id="logoImg" data-logo src="assets/tafa3ul-logo.png" alt="Tafa3ul" width="1432" height="198">
+    <span class="brand__sep" aria-hidden="true"></span>
+    <span class="brand__txt">Group<br>Hackathon</span>
+  </div>
   <button class="icon-btn" id="muteBtn" type="button" aria-pressed="false" aria-label="Mute sound effects">
     <svg class="ico-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.8 7.8 0 0 1 0 11"/></svg>
     <svg class="ico-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
@@ -529,10 +603,10 @@ main { position: relative; z-index: 1; }
       </h1>
       <p class="sticker sticker--edition">Tafa3ul Edition</p>
     </div>
-    <p class="landing__tagline"><span>5 Questions.</span> <span>1 Personality.</span> <span>Unlimited Chaos.</span></p>
+    <p class="landing__tagline"><span>10 Questions.</span> <span>1 Personality.</span> <span>Unlimited Chaos.</span></p>
     <div class="landing__copy" lang="ar" dir="rtl">
       <p class="lead">كل واحد بالهاكاثون عنده شخصية... وبعض الشخصيات المفروض ما نخليها تقرّب من الـDeadline.</p>
-      <p class="sub">جاوب على 5 أسئلة واكتشف شنو نوعك الحقيقي من ورا الكواليس.</p>
+      <p class="sub">جاوب على 10 أسئلة واكتشف شنو نوعك الحقيقي من ورا الكواليس.</p>
     </div>
     <div class="landing__cta">
       <button class="btn btn--block" id="startBtn" type="button">Expose My Personality <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
@@ -546,7 +620,7 @@ main { position: relative; z-index: 1; }
     <div><button class="link-btn" id="introBack" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>Back</button></div>
     <h2 class="intro__title" id="introTitle" lang="ar" dir="rtl" tabindex="-1">جاهز تعرف شنو نوع الكارثة اللي تمثلها بالهاكاثون؟</h2>
     <div class="intro__sub">
-      <p lang="ar" dir="rtl">5 أسئلة ونكشف حقيقتك.</p>
+      <p lang="ar" dir="rtl">10 أسئلة ونكشف حقيقتك.</p>
       <p>No pressure. Actually, a little pressure.</p>
     </div>
     <form class="form" id="introForm" novalidate autocomplete="off">
@@ -562,15 +636,17 @@ main { position: relative; z-index: 1; }
       </div>
       <button class="btn btn--block intro__go" type="submit">Let's Find Out <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
     </form>
+    <p class="signoff"><i class="motif" aria-hidden="true"></i><span>Tafa3ul Group Internal Hackathon</span><i class="motif" aria-hidden="true"></i></p>
   </section>
 
   <!-- ============ SCREEN 3: QUIZ (questions are rendered from the QUESTIONS array) ============ -->
   <section class="screen quiz" id="screen-quiz" data-screen="quiz" aria-label="Personality quiz" hidden>
     <div class="quiz__bar">
       <button class="link-btn" id="quizBack" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>Back</button>
-      <div class="progress" id="progress" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0"></div>
+      <div class="progress" id="progress" role="progressbar" aria-label="Quiz progress" aria-valuemin="1" aria-valuemax="10" aria-valuenow="1"></div>
     </div>
     <div class="q" id="quizStage"></div>
+    <p class="signoff"><i class="motif" aria-hidden="true"></i><span>Tafa3ul Group Internal Hackathon</span><i class="motif" aria-hidden="true"></i></p>
   </section>
 
   <!-- ============ SCREEN 4: REVEAL ============ -->
@@ -579,33 +655,47 @@ main { position: relative; z-index: 1; }
     <p class="reveal__pct" aria-hidden="true"><span id="revealPct">0</span>%</p>
     <p class="reveal__msg" id="revealMsg" role="status" tabindex="-1"></p>
     <div class="reveal__bar" aria-hidden="true"><i id="revealBar"></i></div>
+    <p class="signoff"><i class="motif" aria-hidden="true"></i><span>Tafa3ul Group Internal Hackathon</span><i class="motif" aria-hidden="true"></i></p>
   </section>
 
   <!-- ============ SCREEN 5: RESULT ============ -->
   <section class="screen result" id="screen-result" data-screen="result" aria-labelledby="rTitle" hidden>
     <div class="result__main">
+      <!-- Hero panel: tone, pattern, emblem and stickers of the personality (drawn by drawHero) -->
       <canvas class="result__art" id="resultArt" width="1080" height="620" aria-hidden="true"></canvas>
       <div class="result__hero">
         <p class="sticker sticker--rarity" id="rRarity"></p>
         <p class="result__who"><span class="result__nick" id="rNick" dir="auto"></span><span class="pill" id="rTeam" dir="auto" hidden></span></p>
         <p class="result__is">is officially</p>
         <h2 class="lockup" id="rTitle" tabindex="-1"></h2>
+        <p class="edition" id="rEdition"></p>
         <p class="result__tagline" id="rTagline" dir="auto"></p>
       </div>
       <div class="result__stats">
         <div class="meter" id="mChaos"><p class="meter__label">Chaos Level</p><p class="meter__value"><span data-val>0</span>%</p><div data-dots aria-hidden="true"></div></div>
         <div class="meter" id="mCrea"><p class="meter__label">Creativity Level</p><p class="meter__value"><span data-val>0</span>%</p><div data-dots aria-hidden="true"></div></div>
       </div>
-      <p class="result__desc" id="rDesc" lang="ar" dir="rtl"></p>
+      <!-- Personal story: every line below is chosen from this participant's answers -->
+      <div class="story" lang="ar" dir="rtl">
+        <p class="story__intro" id="rIntro"></p>
+        <p class="story__label">الدليل من أجوبتك</p>
+        <ul class="story__receipts" id="rReceipts"></ul>
+        <p class="story__twist" id="rTwist"></p>
+      </div>
+      <div class="roast">
+        <p class="roast__label">Your personal roast</p>
+        <p class="roast__text" id="rRoast" lang="ar" dir="rtl"></p>
+      </div>
       <dl class="traits">
-        <div><dt>Signature strength</dt><dd id="rStrength"></dd></div>
-        <div><dt>Funny weakness</dt><dd id="rWeakness"></dd></div>
+        <div><dt>Signature strength</dt><dd id="rStrength"></dd><dd class="traits__plus" id="rStrengthPlus"></dd></div>
+        <div><dt>Funny weakness</dt><dd id="rWeakness"></dd><dd class="traits__plus" id="rWeaknessPlus"></dd></div>
       </dl>
     </div>
 
     <div class="result__card">
       <h3>Your Wrapped card</h3>
       <p class="result__card-sub"><span>PNG, 1080 × 1920</span><span lang="ar" dir="rtl">الكارت مالتك جاهز للستوري.</span></p>
+      <p class="result__layout" id="rLayout"></p>
       <div class="card-preview is-loading" id="cardPreview" role="button" tabindex="0" aria-label="Open your card full size"><img id="cardImg" alt="" width="1080" height="1920" hidden></div>
       <p class="result__hint" id="saveHint"></p>
     </div>
@@ -619,9 +709,15 @@ main { position: relative; z-index: 1; }
       <button class="btn btn--outline btn--block" id="retakeBtn" type="button">Retake the Quiz</button>
     </div>
 
+    <!-- Branded footer -->
     <footer class="result__foot">
-      <p lang="ar" dir="rtl">مو كل الأبطال يلبسون كاب... بعضهم بس يسوون Ctrl+Z.</p>
-      <p class="result__foot-row"><span>100% for fun. 0% scientifically approved.</span><span>Powered by Tafa3ul Group</span></p>
+      <p class="result__foot-line" lang="ar" dir="rtl">مو كل الأبطال يلبسون كاب... بعضهم بس يسوون Ctrl+Z.</p>
+      <div class="brandfoot">
+        <img class="brandfoot__logo" data-logo src="assets/tafa3ul-logo.png" alt="Tafa3ul" width="1432" height="198">
+        <i class="motif" aria-hidden="true"></i>
+        <p class="brandfoot__by">Powered by Tafa3ul Group</p>
+        <p class="brandfoot__note">Made for Tafa3ul people only. 100% for fun. 0% scientifically approved.</p>
+      </div>
     </footer>
   </section>
 </main>
@@ -655,11 +751,12 @@ main { position: relative; z-index: 1; }
    WHERE TO EDIT
    1. BRAND + SETTINGS ....... logo path, input limits
    2. COLOURS ................ shared palette used by themes and the card
-   3. QUESTIONS .............. the five questions, answers and trait weights
-   4. PERSONALITIES .......... titles, taglines, descriptions, colours
-   5. LEVELS ................. how Chaos / Creativity percentages are derived
-   6. COPY ................... small interface texts
-   Everything below section 6 is machinery.
+   3. QUESTIONS .............. the ten questions, answers, trait weights
+   4. PERSONALITIES .......... titles, taglines, intros, labels, colours
+   5. PERSONALISATION ........ editions, roasts and other answer-driven lines
+   6. LEVELS ................. how Chaos / Creativity percentages are derived
+   7. COPY ................... small interface texts
+   Everything below section 7 is machinery.
    ===================================================================== */
 (function () {
   'use strict';
@@ -674,28 +771,39 @@ main { position: relative; z-index: 1; }
   var LOGO_SRC = 'assets/tafa3ul-logo.png';
   var NICK_MAX = 18;            // max nickname length
   var TEAM_MAX = 24;            // max team-name length
-  var STORAGE_KEY = 'hackathon-wrapped-tafa3ul-v1';
-  var LRM = '‎';           // keeps a final "." attached to English at the end of an Arabic line
+  var STORAGE_KEY = 'hackathon-wrapped-tafa3ul-v2';
+  // Invisible left-to-right mark: keeps a final "." attached to an English sentence at the end of an Arabic line.
+  var LRM = String.fromCharCode(0x200E);
 
   /* ------------------------------------------------------------------
      2. COLOURS
      One list for the whole experience. Each entry is also published to
-     CSS as a variable of the same name (ink → var(--ink)), so changing a
-     value here recolours the page, the artwork and the exported card.
+     CSS as a variable of the same name (ink → var(--ink), brandInk →
+     var(--brand-ink)), so changing a value here recolours the page, the
+     artwork and the exported card.
+     brandInk and brandGrey are sampled from the Tafa3ul logo and used for
+     the brand plate, the footer and the dot motif. The logo file itself is
+     never recoloured.
      ------------------------------------------------------------------ */
   var C = {
     ink: '#1B0B3A', violet: '#5B2BE0', blue: '#2D4BFF', lime: '#C8FF2E', pink: '#FF3D9A',
     orange: '#F4500F', yellow: '#FFD60A', cream: '#FFF4DF', lilac: '#BFA2FF', white: '#FFFFFF',
-    coral: '#FF5C7A', mint: '#1FD6B4'
+    coral: '#FF5C7A', mint: '#1FD6B4',
+    brandInk: '#262933', brandGrey: '#8B8FA0'
   };
 
   /* ------------------------------------------------------------------
      3. QUESTIONS
-     Each answer adds points to personality traits. Trait keys:
-       analytical, creativity, communication, organization, adaptability,
-       pressure, spontaneity, strategic, empathy
-     Keep exactly four answers per question. After editing weights, run
-     HackathonWrapped.test() in the browser console to re-check balance.
+     Ten questions, four answers each. The order is shuffled for every
+     participant; scoring does not depend on the order.
+     Each answer has:
+       text    what the participant taps
+       traits  points added to personality traits. Trait keys:
+               analytical, creativity, communication, organization,
+               adaptability, pressure, spontaneity, strategic, empathy
+       receipt a short line quoted back in the result ("the evidence")
+     After editing weights, run HackathonWrapped.test() in the browser
+     console to re-check that all eight personalities are still reachable.
      ------------------------------------------------------------------ */
   var TRAITS = {
     analytical: 'Analytical Thinking',
@@ -711,169 +819,351 @@ main { position: relative; z-index: 1; }
 
   var QUESTIONS = [
     {
-      text: 'الهاكاثون بلّش... أول شي تسويه شنو؟',
-      heckle: 'ماكو جواب غلط. بس أكو أجوبة تفضح.',
+      text: 'العميل دز Feedback قبل الـDeadline بنص ساعة. شنو أول ردة فعل عندك؟',
       answers: [
-        { text: 'أول شي نفهم المشكلة، بعدين نفكر بالحل... عندي 17 سؤال.', traits: { analytical: 3, strategic: 1, organization: 1 } },
-        { text: 'عندي فكرة! لا لحظة، عندي فكرة أحسن!', traits: { creativity: 3, spontaneity: 2, communication: 1 } },
-        { text: 'منو يسوي شنو؟ تعالوا نوزع المهام قبل لا نتعارك.', traits: { organization: 3, communication: 1, empathy: 1, adaptability: 1 } },
-        { text: 'أراقب الوضع بصمت... وبعدين أفاجئكم.', traits: { strategic: 3, analytical: 1, pressure: 1 } }
+        { text: 'هسه بدا الشغل الحقيقي. I work best under panic.' + LRM, traits: { pressure: 3, adaptability: 2, spontaneity: 1 },
+          receipt: 'العميل دز Feedback بآخر نص ساعة، وإنت اعتبرتها بداية الدوام.' },
+        { text: 'منو عنده آخر نسخة؟ FINAL_FINAL_V7 لو FINAL_V8_REAL؟', traits: { organization: 3, analytical: 1 },
+          receipt: 'أول سؤال عندك بالأزمة: وين FINAL_FINAL_V7؟' },
+        { text: 'أقرا الـFeedback خمس مرات. شنو يعني Make it pop بالضبط؟', traits: { analytical: 3, strategic: 1 },
+          receipt: 'لحد هسه تحلل شنو يعني Make it pop بالضبط.' },
+        { text: 'أكول للتيم لا تخافون، وإني أول واحد خايف.', traits: { empathy: 3, communication: 1, adaptability: 1 },
+          receipt: 'طمّنت التيم كله، وإنت أول واحد خايف.' }
       ]
     },
     {
-      text: 'باقي ساعة على الـDeadline والتيم بعده ما مخلص. شتسوي؟',
-      heckle: 'لا تفكر هواي، مو امتحان وزاري.',
+      text: 'بالـBrainstorming Session، شنو دورك الحقيقي؟',
       answers: [
-        { text: 'هسه وقتي. I was born for this pressure.' + LRM, traits: { pressure: 3, adaptability: 2, spontaneity: 1 } },
-        { text: 'أفتح 12 تاب وأبدي أحلل ليش وصلنا لهالمرحلة.', traits: { analytical: 3, strategic: 1 } },
-        { text: 'أجمع التيم، أسوي خطة إنقاذ، وأوزع المهام.', traits: { organization: 2, adaptability: 2, communication: 1, pressure: 1 } },
-        { text: 'أكول للتيم لا تخافون، وإني من داخلي منهار.', traits: { empathy: 3, communication: 1, adaptability: 1 } }
+        { text: 'أطلع 15 فكرة وما أقتنع بوحدة.', traits: { creativity: 3, spontaneity: 2 },
+          receipt: 'طلعت 15 فكرة بالـBrainstorming وما اقتنعت بوحدة.' },
+        { text: 'أكول خلونا نرجع للـBrief. للمرة السادسة.', traits: { analytical: 3, strategic: 1, organization: 1 },
+          receipt: 'رجّعت التيم للـBrief ست مرات بجلسة وحدة.' },
+        { text: 'أحوّل كل فكرة إلى Presentation، حتى اللي محد طلبها.', traits: { communication: 3, creativity: 1, spontaneity: 1 },
+          receipt: 'حوّلت فكرة عابرة إلى Presentation محد طلبها.' },
+        { text: 'أسمع الكل، وبالنهاية أطلع بفكرة محد متوقعها.', traits: { strategic: 3, creativity: 1, analytical: 1 },
+          receipt: 'سمعت الكل وإنت ساكت، وطلعت بفكرة محد متوقعها.' }
       ]
     },
     {
-      text: 'أحد أعضاء التيم يكول: عندي فكرة مجنونة. رد فعلك؟',
-      heckle: 'هاي الإجابة راح نحتفظ بيها ضدك. Just kidding.' + LRM,
+      text: 'التيم قرر يغيّر فكرة المشروع بنص الهاكاثون. شتسوي؟',
       answers: [
-        { text: 'احچي! حتى لو مستحيلة، نكدر نسويها.', traits: { empathy: 2, adaptability: 2, creativity: 1, spontaneity: 1 } },
-        { text: 'بس خل نفكر بالمخاطر والـBudget والوقت.', traits: { analytical: 2, organization: 2, strategic: 1 } },
-        { text: 'أوكي، بس منو راح ينفذها؟', traits: { organization: 2, strategic: 2 } },
-        { text: 'أبدي أشرح فكرتي الأحسن لمدة 20 دقيقة.', traits: { communication: 3, creativity: 1, spontaneity: 1 } }
+        { text: 'أخيراً! من البداية عندي فكرة أحسن، بس ما حچيت.', traits: { strategic: 3, creativity: 1 },
+          receipt: 'جان عندك فكرة أحسن من البداية وما حچيت.' },
+        { text: 'أحسب شكد وقت ضيّعنا، وأتوتر بالأرقام.', traits: { analytical: 3, organization: 1 },
+          receipt: 'حسبت الوقت الضايع بالدقيقة وتوترت بالأرقام.' },
+        { text: 'أرتب خطة جديدة وأوزع المهام قبل لا أحد يعترض.', traits: { organization: 2, adaptability: 2, communication: 1, pressure: 1 },
+          receipt: 'التيم غيّر الفكرة، وإنت وزّعت المهام قبل لا أحد يعترض.' },
+        { text: 'عادي، نبلّش من الصفر. باقي وقت... تقريباً.', traits: { pressure: 3, adaptability: 2, spontaneity: 1 },
+          receipt: 'بلّشت من الصفر بنص الهاكاثون وكلت: عادي.' }
       ]
     },
     {
-      text: 'شنو دورك الحقيقي بالـTeam Meeting؟',
-      heckle: 'خذ راحتك. الـDeadline مو علينا هالمرة.',
+      text: 'العميل دز Brief سطرين ونص. شنو تسوي؟',
       answers: [
-        { text: 'أحچي، أناقش، أقنع... وأحياناً أنسى شنو السؤال.', traits: { communication: 3, spontaneity: 1, adaptability: 1 } },
-        { text: 'أكتب الملاحظات وأرتب كلشي حتى لا نضيع.', traits: { organization: 3, analytical: 1 } },
-        { text: 'ساكت، بس من أحچي أغيّر اتجاه النقاش كله.', traits: { strategic: 3, analytical: 1 } },
-        { text: 'أجيب أفكار من كوكب ثاني وأخلي الكل يحتار.', traits: { creativity: 3, spontaneity: 2 } }
+        { text: 'أرجعله بـ12 سؤال قبل لا أكتب حرف.', traits: { analytical: 3, strategic: 1, organization: 1 },
+          receipt: 'الـBrief سطرين، وإنت رجّعت 12 سؤال.' },
+        { text: 'سطرين يكفون! عندي Concept كامل براسي.', traits: { creativity: 3, spontaneity: 2 },
+          receipt: 'سطرين ونص كفّوك حتى تبني Concept كامل.' },
+        { text: 'أسوي Timeline وChecklist وفولدر باسم المشروع.', traits: { organization: 3, analytical: 1 },
+          receipt: 'سوّيت Timeline وChecklist وفولدر قبل لا تفهم المشروع.' },
+        { text: 'أتصل بيه وأحچي وياه ساعة حتى أفهم شنو يريد.', traits: { communication: 3, empathy: 1, adaptability: 1 },
+          receipt: 'حچيت ويا العميل ساعة حتى تفهم سطرين.' }
       ]
     },
     {
-      text: 'وصل وقت الـPresentation. شنو يصير؟',
-      heckle: 'Last one. Your coworkers are about to learn too much.',
+      text: 'Meeting داخلي المفروض 15 دقيقة وصار ساعة. شنو دورك بهالجريمة؟',
       answers: [
-        { text: 'أطلع أحچي بثقة حتى لو آخر سلايد توّه خلص.', traits: { pressure: 2, communication: 2, adaptability: 1, spontaneity: 1 } },
-        { text: 'أراجع كل تفصيلة وأفكر شنو ممكن يسألونا.', traits: { analytical: 2, strategic: 2, organization: 1 } },
-        { text: 'أرتب المتحدثين وأتأكد كل واحد يعرف دوره.', traits: { organization: 2, empathy: 2, communication: 1, adaptability: 1 } },
-        { text: 'أطلع بفكرة أو حركة غير متوقعة تخلي الكل يتذكرنا.', traits: { creativity: 2, spontaneity: 2, strategic: 1, pressure: 1 } }
+        { text: 'إني السبب. جنت أشرح نقطة وتفرّعت.', traits: { communication: 3, spontaneity: 1, creativity: 1 },
+          receipt: 'اعترفت إنك السبب بالـMeeting اللي صار ساعة.' },
+        { text: 'أكتب الـAction Points حتى ما نجتمع على نفس السالفة مرة ثانية.', traits: { organization: 3, analytical: 1 },
+          receipt: 'كتبت الـAction Points حتى ما ينعاد الـMeeting.' },
+        { text: 'كل خمس دقايق أحاول أرجّع الكل للموضوع.', traits: { organization: 2, communication: 2, adaptability: 1 },
+          receipt: 'رجّعت الـMeeting للموضوع كل خمس دقايق.' },
+        { text: 'أراقب الوجوه وأعرف منو زعل من منو.', traits: { empathy: 3, analytical: 1 },
+          receipt: 'تعرف منو زعل من منو بالـMeeting قبل لا هم يعرفون.' }
+      ]
+    },
+    {
+      text: 'الـDesigner والـCopywriter اختلفوا على الـHeadline. إنت وين؟',
+      answers: [
+        { text: 'بالنص. أهدّي الطرفين وأكول الاثنين صح.', traits: { empathy: 3, communication: 1, adaptability: 1 },
+          receipt: 'كلت للـDesigner والـCopywriter: الاثنين صح.' },
+        { text: 'أحط Timer خمس دقايق: لو تتفقون، لو أقرر إني.', traits: { organization: 2, adaptability: 2, pressure: 1, communication: 1 },
+          receipt: 'حطّيت Timer للخلاف وهددت تقرر إنت.' },
+        { text: 'أقترح Headline ثالث، ويصير الخلاف ثلاثي.', traits: { creativity: 3, spontaneity: 2 },
+          receipt: 'حلّيت خلاف الـHeadline باقتراح Headline ثالث.' },
+        { text: 'أخلي الاثنين جاهزين وأقرر قبل التسليم بدقيقة. دايماً تضبط.', traits: { pressure: 3, adaptability: 1, spontaneity: 1, strategic: 1 },
+          receipt: 'قررت الـHeadline قبل التسليم بدقيقة. وضبطت.' }
+      ]
+    },
+    {
+      text: 'العميل يكول: كبّروا اللوگو. للمرة الرابعة. شنو تسوي؟',
+      answers: [
+        { text: 'أكبّره 2% وأسأل: هسه أحسن؟', traits: { strategic: 3, pressure: 1 },
+          receipt: 'كبّرت اللوگو 2% وسألت: هسه أحسن؟' },
+        { text: 'أدز Email مرتب بيه كل الـRevisions بالتواريخ.', traits: { organization: 3, analytical: 1, strategic: 1 },
+          receipt: 'وثّقت كل Revision بالتاريخ والساعة.' },
+        { text: 'أشرحله أهمية الـWhite Space لمدة نص ساعة.', traits: { communication: 3, analytical: 1 },
+          receipt: 'شرحت للعميل أهمية الـWhite Space نص ساعة.' },
+        { text: 'أكبّره، وأروح أطمّن الـDesigner إنو مو ذنبه.', traits: { empathy: 3, adaptability: 1 },
+          receipt: 'كبّرت اللوگو ورحت تطمّن الـDesigner.' }
+      ]
+    },
+    {
+      text: 'باقي عشر دقايق على الـPitch. إنت شنو تسوي؟',
+      answers: [
+        { text: 'بعدني أعدّل آخر سلايد. لا تخافون، كلشي يخلص.', traits: { pressure: 3, adaptability: 1, spontaneity: 1 },
+          receipt: 'تعدّل آخر سلايد والـPitch بعد عشر دقايق.' },
+        { text: 'أرتب منو يحچي شوكت، وأتأكد اللابتوب مشحون.', traits: { organization: 2, adaptability: 2, empathy: 1, communication: 1 },
+          receipt: 'تأكدت اللابتوب مشحون قبل لا أحد يفكر بيها.' },
+        { text: 'أتوقع كل سؤال ممكن يسألونا، وأجهّز جوابه.', traits: { analytical: 2, strategic: 2, organization: 1 },
+          receipt: 'جهّزت جواب لكل سؤال ممكن ينسأل.' },
+        { text: 'أضيف مفاجأة للافتتاحية محد يدري بيها، حتى التيم.', traits: { creativity: 2, spontaneity: 2, strategic: 1, pressure: 1 },
+          receipt: 'ضفت مفاجأة للـPitch وما كلت للتيم.' }
+      ]
+    },
+    {
+      text: 'أول نص ساعة بالهاكاثون والكل متحمس. إنت وين؟',
+      answers: [
+        { text: 'عند الـWhiteboard، أقسّم الشغل وأحدد منو يسوي شنو.', traits: { organization: 3, communication: 1, adaptability: 1, empathy: 1 },
+          receipt: 'مسكت الـWhiteboard بأول خمس دقايق.' },
+        { text: 'بالزاوية، أراقب التيمات الثانية وأخطط بصمت.', traits: { strategic: 3, analytical: 1 },
+          receipt: 'راقبت التيمات الثانية من الزاوية وخططت بصمت.' },
+        { text: 'أجيب چاي للكل، وأتأكد محد زعلان من دوره.', traits: { empathy: 3, communication: 1 },
+          receipt: 'جبت چاي للكل وتأكدت محد زعلان.' },
+        { text: 'مرتاح. الإلهام يجي آخر ساعة، مجرّبها.', traits: { pressure: 2, spontaneity: 2, adaptability: 1 },
+          receipt: 'أول الهاكاثون وإنت مرتاح، تنتظر إلهام آخر ساعة.' }
+      ]
+    },
+    {
+      text: 'گروب التيم بالواتساب، الساعة 11 بالليل. شنو تدز؟',
+      answers: [
+        { text: 'Voice Note خمس دقايق. الجزء الأول.', traits: { communication: 3, spontaneity: 1 },
+          receipt: 'دزّيت Voice Note خمس دقايق الساعة 11 بالليل.' },
+        { text: 'فكرة جديدة تغيّر كلشي... وبعدين أختفي.', traits: { creativity: 3, spontaneity: 2 },
+          receipt: 'دزّيت فكرة تغيّر كلشي بنص الليل واختفيت.' },
+        { text: 'ولا شي. أقرا كلشي، وما أرد. Seen.' + LRM, traits: { strategic: 3, analytical: 1 },
+          receipt: 'قريت كل رسائل الگروب وما رديت. Seen.' + LRM },
+        { text: 'Recap مرقّم بمهام باچر، وياه Deadline لكل واحد.', traits: { organization: 3, analytical: 1 },
+          receipt: 'دزّيت Recap مرقّم بنص الليل، وياه Deadlines.' }
       ]
     }
   ];
 
   /* ------------------------------------------------------------------
      4. PERSONALITIES
-     weights  : how strongly each trait pulls toward this personality
-                (negative = pushes away). The strongest match wins.
-     signature: the trait used as the first tie-breaker.
-     titleLines: how the title is broken across lines in the big lockup.
-     theme    : bg / fg (body text) / title / accent (sticker) / button
-                colours, plus a1–a3 used by the abstract artwork.
+     weights   how strongly each trait pulls toward this personality
+               (negative = pushes away). The strongest match wins.
+     signature the trait used as the first tie-breaker.
+     titleLines how the title is broken across lines in the big lockup.
+     intros    three openings; the participant's second-strongest side
+               picks one (head = analytical / strategic / organised,
+               heart = people-minded, spark = creative / fast / pressure).
+     labels    the small sticker, by how chaotic they are for their type.
+     theme     bg / fg (body text) / title / accent (sticker) / button
+               colours, a1–a3 for the artwork, tone for panels, pat for
+               the background pattern.
      ------------------------------------------------------------------ */
   var PERSONALITIES = {
     overthinker: {
       title: 'The Overthinker',
       titleLines: ['THE OVER', 'THINKER'],
       tagline: 'عندك سؤال على كل جواب.',
-      description: 'إنت الشخص اللي يكدر يحوّل قرار بسيط إلى دراسة جدوى من 40 صفحة. التيم يريد يبلّش، وإنت بعدك تسأل: بس ليش؟',
       strength: 'Analytical Thinking',
       weakness: 'Analysis Paralysis',
-      rarity: 'QUESTION COUNT: INFINITE',
+      labels: { hi: 'TABS OPEN: 47', mid: 'QUESTION COUNT: INFINITE', lo: 'FOOTNOTES: MANY' },
+      intros: {
+        head: 'إنت تحوّل قرار بسيط إلى دراسة جدوى من 40 صفحة، وبعدها تضيف ملحق.',
+        heart: 'تحلل كلشي، حتى مزاج التيم. تسأل «بس ليش؟» بكل لطف، وهذا اللي يخوّف.',
+        spark: 'عقلك فاتح 12 تاب بنفس الوقت، وكل تاب بيه فكرة وسؤالين.'
+      },
       signature: 'analytical',
       weights: { analytical: 1.0, strategic: 0.25, spontaneity: -0.3 },
-      theme: { bg: C.blue, fg: C.cream, title: C.lime, accent: C.lime, btnBg: C.lime, btnFg: C.ink, btnSide: '#84AE14', a1: C.lime, a2: C.pink, a3: C.ink }
+      theme: { bg: C.blue, fg: C.cream, title: C.lime, accent: C.lime, btnBg: C.lime, btnFg: C.ink, btnSide: '#84AE14', a1: C.lime, a2: C.pink, a3: C.ink, tone: '#1F3BE6', pat: 'rgba(255,244,223,.13)' }
     },
     lastMinuteGenius: {
       title: 'The Last-Minute Genius',
       titleLines: ['THE LAST-', 'MINUTE', 'GENIUS'],
       tagline: "Deadline? That's my love language.",
-      description: 'طول الوقت هادي، بس قبل التسليم بـ15 دقيقة تتحول إلى ماكينة إنجاز. محد يعرف شلون، حتى إنت.',
       strength: 'Pressure Handling',
       weakness: 'Suspicious Time Management',
-      rarity: 'CLUTCH FACTOR: LEGENDARY',
+      labels: { hi: 'CLUTCH FACTOR: LEGENDARY', mid: 'CLUTCH FACTOR: RELIABLE', lo: 'PANIC LEVEL: ELEGANT' },
+      intros: {
+        head: 'هادي طول الوقت لأن الخطة براسك. بس الخطة تبدي قبل التسليم بـ15 دقيقة.',
+        heart: 'تطمّن الكل إنو باقي وقت، وهو ما باقي. وبطريقة ما، دايماً تخلص.',
+        spark: 'قبل التسليم بـ15 دقيقة تتحول إلى ماكينة إنجاز. محد يعرف شلون، حتى إنت.'
+      },
       signature: 'pressure',
       weights: { pressure: 1.0, adaptability: 0.5, spontaneity: 0.4, organization: -0.3 },
-      theme: { bg: C.orange, fg: C.ink, title: C.ink, accent: C.yellow, btnBg: C.ink, btnFg: C.cream, btnSide: '#000000', a1: C.yellow, a2: C.cream, a3: C.ink }
+      theme: { bg: C.orange, fg: C.ink, title: C.ink, accent: C.yellow, btnBg: C.ink, btnFg: C.cream, btnSide: '#000000', a1: C.yellow, a2: C.cream, a3: C.ink, tone: '#DE4407', pat: 'rgba(27,11,58,.11)' }
     },
     chaosCoordinator: {
       title: 'The Chaos Coordinator',
       titleLines: ['THE CHAOS', 'COORDINATOR'],
       tagline: 'Everything is under control. Probably.',
-      description: 'كلشي حولك فوضى، بس إنت الوحيد اللي تعرف منو ضيّع الملف، ومنو مسؤول عن السلايدات، وليش بعدنا ما متغدين.',
       strength: 'Team Coordination',
       weakness: 'Controlling the Uncontrollable',
-      rarity: 'CHAOS CLASS: LEGENDARY',
+      labels: { hi: 'CHAOS CLASS: LEGENDARY', mid: 'CHAOS CLASS: MANAGED', lo: 'CHAOS CLASS: SUSPICIOUSLY CALM' },
+      intros: {
+        head: 'كلشي حولك فوضى، بس إنت الوحيد اللي يعرف وين الملف ومنو مسؤول عن السلايدات.',
+        heart: 'تدير Revisions العميل بإيد، وتهدّي التيم بالإيد الثانية.',
+        spark: 'تحب الخطة، بس تحب أكثر لحظة تخرب الخطة وتطلع بحل بخمس دقايق.'
+      },
       signature: 'organization',
       weights: { organization: 0.6, adaptability: 0.6, communication: 0.4, pressure: 0.3, empathy: 0.2 },
-      theme: { bg: C.pink, fg: C.ink, title: C.ink, accent: C.lime, btnBg: C.ink, btnFg: C.lime, btnSide: '#000000', a1: C.lime, a2: C.cream, a3: C.violet }
+      theme: { bg: C.pink, fg: C.ink, title: C.ink, accent: C.lime, btnBg: C.ink, btnFg: C.lime, btnSide: '#000000', a1: C.lime, a2: C.cream, a3: C.violet, tone: '#F02688', pat: 'rgba(27,11,58,.11)' }
     },
     silentMastermind: {
       title: 'The Silent Mastermind',
       titleLines: ['THE SILENT', 'MASTERMIND'],
       tagline: 'Less talking. More plotting.',
-      description: 'ساكت أغلب الوقت، والتيم عبالهم مو مركز. وفجأة تنطي حل يخلي الكل يسكت. Very suspicious.' + LRM,
       strength: 'Strategic Thinking',
       weakness: 'Mysterious Communication',
-      rarity: 'THREAT LEVEL: QUIETLY HIGH',
+      labels: { hi: 'THREAT LEVEL: UNPREDICTABLE', mid: 'THREAT LEVEL: QUIETLY HIGH', lo: 'THREAT LEVEL: CALCULATED' },
+      intros: {
+        head: 'ساكت أغلب الوقت والتيم عبالهم مو مركّز، وإنت مخلّص الخطة والخطة البديلة.',
+        heart: 'ما تحچي هواي، بس تعرف كل واحد شنو يحتاج. تحرّك التيم ومحد ينتبه.',
+        spark: 'ساكت ساكت، وفجأة تنطي فكرة تخلي الكل يسكت. Very suspicious.' + LRM
+      },
       signature: 'strategic',
       weights: { strategic: 1.0, analytical: 0.2, communication: -0.4 },
-      theme: { bg: '#150830', fg: C.cream, title: C.lime, accent: C.lime, btnBg: C.lime, btnFg: C.ink, btnSide: '#84AE14', a1: C.lime, a2: C.violet, a3: C.pink }
+      theme: { bg: '#150830', fg: C.cream, title: C.lime, accent: C.lime, btnBg: C.lime, btnFg: C.ink, btnSide: '#84AE14', a1: C.lime, a2: C.violet, a3: C.pink, tone: '#24114E', pat: 'rgba(255,244,223,.09)' }
     },
     ceoOfYapping: {
       title: 'The CEO of Yapping',
       titleLines: ['THE CEO OF', 'YAPPING'],
       tagline: 'This meeting could have been another meeting.',
-      description: 'عندك موهبة تخلي أبسط فكرة تصير TED Talk. تحچي بثقة، تقنع الناس، وبالنهاية تنسى شنو جان الموضوع الأصلي.',
       strength: 'Communication',
       weakness: 'Unlimited Talking',
-      rarity: 'WORD COUNT: UNLIMITED',
+      labels: { hi: 'WORD COUNT: UNLIMITED', mid: 'WORD COUNT: GENEROUS', lo: 'WORD COUNT: WELL STRUCTURED' },
+      intros: {
+        head: 'تحچي هواي بس كلامك مرتب: مقدمة، ثلاث نقاط، وخاتمة. ومحد طلب Presentation.',
+        heart: 'تحچي ويا الكل وتقنع الكل، وبالنهاية تنسى شنو جان الموضوع الأصلي.',
+        spark: 'تخلي أبسط فكرة تصير TED Talk، وتضيف عليها فقرة ارتجال.'
+      },
       signature: 'communication',
       weights: { communication: 1.0, spontaneity: 0.3, strategic: -0.2 },
-      theme: { bg: C.yellow, fg: C.ink, title: C.ink, accent: C.pink, btnBg: C.ink, btnFg: C.yellow, btnSide: '#000000', a1: C.pink, a2: C.blue, a3: C.cream }
+      theme: { bg: C.yellow, fg: C.ink, title: C.ink, accent: C.pink, btnBg: C.ink, btnFg: C.yellow, btnSide: '#000000', a1: C.pink, a2: C.blue, a3: C.cream, tone: '#F6C600', pat: 'rgba(27,11,58,.09)' }
     },
     ideaMachine: {
       title: 'The Idea Machine',
       titleLines: ['THE IDEA', 'MACHINE'],
       tagline: 'One brain. 47 unfinished ideas.',
-      description: 'كل خمس دقايق عندك فكرة جديدة. التيم يحب إبداعك، بس يتمنى تختار فكرة وحدة وتخليهم يشتغلون.',
       strength: 'Creativity',
       weakness: 'Idea Overload',
-      rarity: 'IDEA OUTPUT: OFF THE CHARTS',
+      labels: { hi: 'IDEA OUTPUT: OFF THE CHARTS', mid: 'IDEA OUTPUT: NONSTOP', lo: 'IDEA OUTPUT: ORGANIZED?!' },
+      intros: {
+        head: 'كل خمس دقايق فكرة، وكل فكرة وياها خطة. التنفيذ؟ هذي فكرة ثانية.',
+        heart: 'كل خمس دقايق فكرة جديدة، وتحچيها بحماس يخلي التيم يقتنع، لحد الفكرة اللي بعدها.',
+        spark: 'كل خمس دقايق عندك فكرة جديدة. التيم يحب إبداعك، بس يتمنى تختار وحدة.'
+      },
       signature: 'creativity',
       weights: { creativity: 1.0, spontaneity: 0.4, organization: -0.3 },
-      theme: { bg: C.lime, fg: C.ink, title: C.ink, accent: C.pink, btnBg: C.ink, btnFg: C.lime, btnSide: '#000000', a1: C.pink, a2: C.violet, a3: C.orange }
+      theme: { bg: C.lime, fg: C.ink, title: C.ink, accent: C.pink, btnBg: C.ink, btnFg: C.lime, btnSide: '#000000', a1: C.pink, a2: C.violet, a3: C.orange, tone: '#B6EE14', pat: 'rgba(27,11,58,.09)' }
     },
     humanChecklist: {
       title: 'The Human Checklist',
       titleLines: ['THE HUMAN', 'CHECKLIST'],
       tagline: "If it's not documented, it didn't happen.",
-      description: 'إنت الشخص اللي يسوي Task List للـTask List. بدونك التيم يضيع، وياك محد يكدر يتحرك بدون Update.',
       strength: 'Organization',
       weakness: 'Excessive Planning',
-      rarity: 'ORDER LEVEL: SUSPICIOUSLY HIGH',
+      labels: { hi: 'ORDER LEVEL: UNDER PRESSURE', mid: 'ORDER LEVEL: HIGH', lo: 'ORDER LEVEL: SUSPICIOUSLY HIGH' },
+      intros: {
+        head: 'إنت اللي يسوي Task List للـTask List. بدونك التيم يضيع، وياك محد يتحرك بدون Update.',
+        heart: 'ترتب كلشي حتى راحة التيم: كل واحد عنده مهمة، ووقت استراحة محدد.',
+        spark: 'حتى الفوضى عندك مرتبة: خطة أولى، خطة بديلة، وفولدر للطوارئ.'
+      },
       signature: 'organization',
       weights: { organization: 1.0, analytical: 0.3, strategic: 0.2, spontaneity: -0.3, adaptability: -0.2 },
-      theme: { bg: C.cream, fg: C.ink, title: C.blue, accent: C.orange, btnBg: C.blue, btnFg: C.cream, btnSide: '#1A2EA8', a1: C.blue, a2: C.orange, a3: C.mint }
+      theme: { bg: C.cream, fg: C.ink, title: C.blue, accent: C.orange, btnBg: C.blue, btnFg: C.cream, btnSide: '#1A2EA8', a1: C.blue, a2: C.orange, a3: C.mint, tone: '#FFE6BC', pat: 'rgba(27,11,58,.08)' }
     },
     teamTherapist: {
       title: 'The Unofficial Team Therapist',
       titleLines: ['THE UNOFFICIAL', 'TEAM', 'THERAPIST'],
       tagline: 'Solving problems. Mostly emotional ones.',
-      description: 'الكل متوتر، وإنت جاي تطمنهم وتصلح العلاقات وتكول الأمور تمام. المشروع بعده ما مخلص، بس على الأقل الكل مرتاح نفسياً.',
       strength: 'Emotional Support & Teamwork',
       weakness: "Carrying Everyone's Stress",
-      rarity: 'OFFICE ENERGY: UNMATCHED',
+      labels: { hi: 'OFFICE ENERGY: UNMATCHED', mid: 'OFFICE ENERGY: WARM', lo: 'OFFICE ENERGY: ZEN' },
+      intros: {
+        head: 'تقرا مزاج التيم مثل ما غيرك يقرا الأرقام. تعرف منو يحتاج استراحة قبل لا هو يعرف.',
+        heart: 'الكل متوتر وإنت تطمّنهم وتصلّح العلاقات. المشروع بعده ما مخلص، بس الكل مرتاح نفسياً.',
+        spark: 'تهدّي التيم بنكتة بالوقت الصح. الـDeadline يقترب، بس الجو حلو.'
+      },
       signature: 'empathy',
       weights: { empathy: 1.0, communication: 0.2, adaptability: 0.2 },
-      theme: { bg: C.lilac, fg: C.ink, title: '#3A14A6', accent: C.cream, btnBg: C.ink, btnFg: C.cream, btnSide: '#000000', a1: C.coral, a2: C.cream, a3: C.violet }
+      theme: { bg: C.lilac, fg: C.ink, title: '#3A14A6', accent: C.cream, btnBg: C.ink, btnFg: C.cream, btnSide: '#000000', a1: C.coral, a2: C.cream, a3: C.violet, tone: '#AD8CF9', pat: 'rgba(27,11,58,.09)' }
     }
   };
   // Fixed order = the last-resort tie-breaker, so results never depend on chance.
   var PERSONALITY_ORDER = ['overthinker', 'lastMinuteGenius', 'chaosCoordinator', 'silentMastermind', 'ceoOfYapping', 'ideaMachine', 'humanChecklist', 'teamTherapist'];
 
   /* ------------------------------------------------------------------
-     5. LEVELS (Chaos % and Creativity %)
+     5. PERSONALISATION
+     Two people with the same personality still get different results.
+     Everything here is picked from their answers, never at random:
+       secondary trait  the side of them that stands out most compared
+                        with other people of the same personality
+       weakest trait    the side that lags most, same comparison
+     EDITIONS       subtitle after the title, by secondary trait
+                    [more chaotic than their type, calmer than their type]
+     TWISTS         closing line of the description, by secondary trait
+     STRENGTH_PLUS  second strength, by secondary trait
+     WEAKNESS_PLUS  second weakness, by weakest trait
+     ROASTS         the one-line roast, by weakest trait (two each)
+     LEVEL_ROASTS   used instead when Chaos or Creativity is extreme
+     ------------------------------------------------------------------ */
+  var EDITIONS = {
+    analytical: ['Spreadsheet Edition', 'Footnotes Included'],
+    creativity: ["Director's Cut", 'Remix Edition'],
+    communication: ['Podcast Edition', 'Extended Commentary'],
+    organization: ['Color-Coded Edition', 'Labeled & Filed'],
+    adaptability: ['Pivot Edition', 'Plan B Edition'],
+    pressure: ['11:59 PM Edition', 'Overtime Cut'],
+    spontaneity: ['Freestyle Edition', 'No-Brief Edition'],
+    strategic: ['Long Game Edition', 'Chess Mode'],
+    empathy: ['Group Hug Edition', 'Tea Break Edition']
+  };
+  var TWISTS = {
+    analytical: 'وفوك هذا، عندك رقم يثبت كل كلمة تكولها.',
+    creativity: 'وفوك هذا، خيالك يشتغل حتى بالأشياء اللي ما تحتاج خيال.',
+    communication: 'وفوك هذا، تشرح الشغل أحسن من ما تسويه. موهبة.',
+    organization: 'وفوك هذا، ملفاتك مسمّاة صح. أقلية نادرة بالوكالة.',
+    adaptability: 'وفوك هذا، تغيّر الخطة أسرع من ما العميل يغيّر رأيه.',
+    pressure: 'وفوك هذا، أحسن شغلك يطلع والساعة ضدك.',
+    spontaneity: 'وفوك هذا، قراراتك تجي بلحظتها. مرات تضبط، ومرات تصير سالفة.',
+    strategic: 'وفوك هذا، دايماً سابق التيم بخطوتين وساكت.',
+    empathy: 'وفوك هذا، إنت أول واحد يلاحظ إذا أحد من التيم مو تمام.'
+  };
+  var STRENGTH_PLUS = {
+    analytical: 'Receipts for Everything', creativity: 'Ideas on Tap', communication: 'Sells Any Idea',
+    organization: 'Knows Where the File Is', adaptability: 'Pivots Without Crying', pressure: 'Deadline Adrenaline',
+    spontaneity: 'Fast Decisions', strategic: 'Three Steps Ahead', empathy: 'Reads the Room'
+  };
+  var WEAKNESS_PLUS = {
+    analytical: 'Vibes Over Numbers', creativity: 'Loves a Template', communication: 'Replies: Eventually',
+    organization: 'Desktop: 214 Files', adaptability: 'Change Requests Hurt', pressure: 'Allergic to "Urgent"',
+    spontaneity: 'Needs a Plan to Improvise', strategic: 'Plan: We Will See', empathy: 'Small Talk Optional'
+  };
+  var ROASTS = {
+    analytical: ['الأرقام عندك وجهة نظر.', 'تقرا الـReport من العنوان وتكول: واضح.'],
+    creativity: ['آخر فكرة مجنونة عندك جانت تغيير لون الـHighlighter.', 'الـBrainstorming عندك: نفس فكرة السنة الفاتت، بس Bold.'],
+    communication: ['تدز «تمام» وتعتبرها اجتماع كامل.', 'آخر رسالة منك بالگروب جانت بالعيد.'],
+    organization: ['ملفاتك اسمها Untitled-1 لحد Untitled-47.', 'الـDesktop مالتك يحتاج فريق إنقاذ.'],
+    adaptability: ['تغيير صغير بالخطة، وتحتاج يومين تتقبله.', 'الـPlan B عندك هو Plan A بس بعصبية.'],
+    pressure: ['تسمع كلمة Urgent وتحتاج استراحة.', 'قبل الـDeadline بيوم إنت مخلّص ونايم. مريب.'],
+    spontaneity: ['حتى الطلعة ويا الأصدقاء تحتاج Calendar Invite.', 'آخر قرار عفوي أخذته جان بسنة 2019.'],
+    strategic: ['الخطة عندك: نبلّش ونشوف.', 'تفكر بالخطوة الجاية بعد ما توصلها.'],
+    empathy: ['تسأل «شلونك؟» وتكمل قبل لا تسمع الجواب.', 'تعاطفك موجود، بس بعد الـDeadline.']
+  };
+  var LEVEL_ROASTS = {
+    chaosHigh: 'الـChaos Level مالتك مو رقم، هذا تحذير للتيم.',        // Chaos 90% or more
+    chaosLow: 'الـChaos عندك قليل لدرجة الـExcel يغار منك.',           // Chaos 8% or less
+    creativityHigh: 'إبداعك عالي لدرجة الـBrief صار مجرد اقتراح.',     // Creativity 93% or more
+    creativityLow: 'إبداعك محفوظ بمكان آمن. آمن كلش.'                  // Creativity 10% or less
+  };
+
+  /* ------------------------------------------------------------------
+     6. LEVELS (Chaos % and Creativity %)
      Each level is a weighted mix of traits, rescaled so the lowest possible
      set of answers gives 0 and the highest gives 100. No randomness.
      curve < 1 lifts the middle of the range; floor is the lowest value shown.
@@ -890,10 +1180,24 @@ main { position: relative; z-index: 1; }
   };
 
   /* ------------------------------------------------------------------
-     6. COPY (small interface texts)
+     7. COPY (small interface texts)
+     heckles: one line under each question, by position in the quiz (not
+     by question, because the order is shuffled).
      ------------------------------------------------------------------ */
   var COPY = {
-    marquee: ['Your hackathon personality is about to be exposed', 'No pressure', 'Actually, a little pressure', '8 personalities', 'Zero science'],
+    marquee: ['Tafa3ul Group internal hackathon', 'Your hackathon personality is about to be exposed', 'No pressure', 'Actually, a little pressure', '10 questions', '8 personalities', 'Zero science'],
+    heckles: [
+      'ماكو جواب غلط. بس أكو أجوبة تفضح.',
+      'لا تفكر هواي، مو امتحان وزاري.',
+      'هاي الإجابة راح نحتفظ بيها ضدك. Just kidding.' + LRM,
+      'خذ راحتك. الـDeadline مو علينا هالمرة.',
+      'نص الطريق. لحد هسه الوضع... مثير للاهتمام.',
+      'الـHR ما يشوف هاي الأجوبة. على الأغلب.',
+      'جاوب بصدق. مو مثل الـTimesheet.',
+      'بعد سؤالين ونخلص. تحمّل.',
+      'تقريباً خلصنا. مثل ما نكول للعميل.',
+      'Last one. Your coworkers are about to learn too much.'
+    ],
     nickRequired: 'اكتب اسمك أول. ما نكدر نفضح واحد مجهول.',
     reveal: [
       'Analyzing your questionable decisions...',
@@ -915,19 +1219,21 @@ main { position: relative; z-index: 1; }
   };
 
   /* ------------------------------------------------------------------
-     Screen themes (landing, form, the five questions, reveal).
+     Screen themes (landing, form, the question screens, reveal).
+     Questions cycle through q0…q6 by position.
      shapes: [x%, y%, scale, rotation, colour1, colour2, opacity] for the
      five background shapes: A big dot, B big fused pair, C small dot,
      D fused pair, E ring.
      ------------------------------------------------------------------ */
+  var QUIZ_SCENES = 7;
   var SCENES = {
     landing: {
       theme: { bg: C.ink, fg: C.cream, title: C.cream, accent: C.lime, btnBg: C.lime, btnFg: C.ink, btnSide: '#84AE14' },
-      shapes: { A: [97, 8, 1, 0, C.pink, C.orange, 1], B: [6, 95, 1, -24, C.violet, '#7C4DFF', 1], C: [101, 82, 1, 0, C.lime, '#E4FF7A', 1], D: [74, 52, 1.1, 38, '#27104F', '#31166A', 1], E: [18, 68, 1, 0, '#3A1A80', '', 1] }
+      shapes: { A: [97, 8, 1, 0, C.pink, C.orange, 1], B: [6, 95, 1, -24, C.violet, '#7C4DFF', 1], C: [104, 89, 1, 0, C.lime, '#E4FF7A', 1], D: [74, 52, 1.1, 38, '#27104F', '#31166A', 1], E: [18, 68, 1, 0, '#3A1A80', '', 1] }
     },
     intro: {
       theme: { bg: C.cream, fg: C.ink, title: C.ink, accent: C.pink, btnBg: C.violet, btnFg: C.cream, btnSide: '#34119A' },
-      shapes: { A: [102, 2, .9, 0, C.pink, C.orange, 1], B: [12, 99, 1, 18, '#FFE3B5', '#FFD79A', 1], C: [-2, 22, 1, 0, C.lime, C.lime, 1], D: [92, 62, 1, -40, '#FFEACB', '#FFDFAE', 1], E: [60, 104, 1, 0, C.violet, '', 1] }
+      shapes: { A: [102, 2, .9, 0, C.pink, C.orange, 1], B: [12, 99, 1, 18, '#FFE3B5', '#FFD79A', 1], C: [-2, 22, 1, 0, C.lime, C.lime, 1], D: [92, 62, 1, -40, '#FFEACB', '#FFDFAE', 1], E: [58, 104, 1, 0, '#FFDFAE', '', 1] }
     },
     q0: {
       theme: { bg: C.blue, fg: C.cream, title: C.cream, accent: C.lime, btnBg: C.lime, btnFg: C.ink, btnSide: '#84AE14' },
@@ -948,6 +1254,14 @@ main { position: relative; z-index: 1; }
     q4: {
       theme: { bg: C.lime, fg: C.ink, title: C.ink, accent: C.violet, btnBg: C.ink, btnFg: C.lime, btnSide: '#000000' },
       shapes: { A: [97, 90, 1.1, 0, '#D6FF62', '#DEFF7C', 1], B: [8, 5, 1, -26, '#B6EC18', '#ADE30E', 1], C: [-1, 58, 1, 0, C.pink, C.pink, 1], D: [99, 28, .9, 50, '#D6FF62', '#DEFF7C', 1], E: [12, 101, 1, 0, '#ADE30E', '', 1] }
+    },
+    q5: {
+      theme: { bg: C.yellow, fg: C.ink, title: C.ink, accent: C.violet, btnBg: C.ink, btnFg: C.yellow, btnSide: '#000000' },
+      shapes: { A: [3, 92, 1.1, 0, '#FFE04A', '#FFE766', 1], B: [93, 6, 1, 28, '#F3C900', '#EBC100', 1], C: [101, 54, 1, 0, C.pink, C.pink, 1], D: [1, 30, .9, -44, '#FFE04A', '#FFE766', 1], E: [90, 101, 1, 0, '#EBC100', '', 1] }
+    },
+    q6: {
+      theme: { bg: C.lilac, fg: C.ink, title: C.ink, accent: '#3A14A6', btnBg: C.ink, btnFg: C.cream, btnSide: '#000000' },
+      shapes: { A: [97, 91, 1.1, 0, '#CDB6FF', '#D6C2FF', 1], B: [9, 5, 1, -20, '#AE8DF8', '#A684F2', 1], C: [-1, 60, 1, 0, C.lime, C.lime, 1], D: [99, 27, .9, 56, '#CDB6FF', '#D6C2FF', 1], E: [12, 101, 1, 0, '#A684F2', '', 1] }
     },
     reveal: {
       theme: { bg: '#150830', fg: C.cream, title: C.cream, accent: C.lime, btnBg: C.lime, btnFg: C.ink, btnSide: '#84AE14' },
@@ -974,11 +1288,21 @@ main { position: relative; z-index: 1; }
   var TAU = Math.PI * 2;
   var clamp = function (v, a, b) { return Math.min(b, Math.max(a, v)); };
   var lerp = function (a, b, t) { return a + (b - a) * t; };
-  var hasArabic = function (s) { return /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/.test(s); };
   var pad2 = function (n) { return (n < 10 ? '0' : '') + n; };
+  // True when the text contains Arabic letters (decides right-to-left layout).
+  function hasArabic(s) {
+    for (var i = 0; i < s.length; i++) {
+      var ch = s.charCodeAt(i);
+      if ((ch >= 0x0600 && ch <= 0x06FF) || (ch >= 0x0750 && ch <= 0x077F) || (ch >= 0xFB50 && ch <= 0xFDFF) || (ch >= 0xFE70 && ch <= 0xFEFF)) return true;
+    }
+    return false;
+  }
 
   /* ------------------------------------------------------------------
-     7. SCORING ENGINE (deterministic)
+     8. SCORING ENGINE (deterministic, independent of question order)
+     `answers` is always indexed by question (QUESTIONS[0] … QUESTIONS[9]),
+     never by the shuffled position, so the order on screen cannot change
+     the result.
      ------------------------------------------------------------------ */
   var TRAIT_KEYS = Object.keys(TRAITS);
 
@@ -1056,7 +1380,7 @@ main { position: relative; z-index: 1; }
     return Math.max(L.floor || 0, Math.round(100 * Math.pow(x, L.curve || 1)));
   }
 
-  // answers: array of five numbers 0–3. Returns the same result for the same answers, always.
+  // answers: one number 0–3 per question. Returns the same result for the same answers, always.
   function computeResult(answers) {
     var norm = normalizeTraits(tallyTraits(answers));
     var scores = {}, best = null;
@@ -1073,36 +1397,194 @@ main { position: relative; z-index: 1; }
   }
 
   /* ------------------------------------------------------------------
-     8. STATE + STORAGE (localStorage only; nothing is sent anywhere)
+     9. PERSONALISATION ENGINE (deterministic)
+     Turns one set of answers into a full personal profile: edition,
+     description, receipts, roast, extra strength / weakness, label and
+     card layout. Nothing here is random.
+
+     To tell two Chaos Coordinators apart we compare each person with a
+     typical member of their own personality. getTypeBaseline() returns those
+     typical values, measured once per visit from a fixed, repeatable
+     sample of answer sets (same sample on every device).
      ------------------------------------------------------------------ */
-  var state = { screen: 'landing', nick: '', team: '', answers: [null, null, null, null, null], q: 0, muted: false, result: null };
+  var FAMILY = { analytical: 'head', strategic: 'head', organization: 'head', empathy: 'heart', communication: 'heart', adaptability: 'heart', creativity: 'spark', spontaneity: 'spark', pressure: 'spark' };
+
+  // Card layouts and the traits that pull toward each one.
+  var LAYOUT_ORDER = ['type', 'geo', 'editorial', 'sticker'];
+  var LAYOUT_TRAITS = {
+    type: ['communication', 'pressure'],                   // bold typography
+    geo: ['analytical', 'strategic', 'organization'],      // abstract geometric
+    editorial: ['empathy', 'adaptability'],                // editorial poster
+    sticker: ['creativity', 'spontaneity']                 // playful stickers
+  };
+  var LAYOUT_NAMES = { type: 'Bold type', geo: 'Geometric', editorial: 'Editorial poster', sticker: 'Sticker collage' };
+  function layoutAffinity(norm, key) {
+    var t = LAYOUT_TRAITS[key], s = 0;
+    for (var i = 0; i < t.length; i++) s += norm[t[i]];
+    return s / t.length;
+  }
+
+  // Measured on first use (and warmed up shortly after the page appears), so it never delays start-up.
+  var typeBaseline = null;
+  function getTypeBaseline() { if (!typeBaseline) typeBaseline = measureTypeBaseline(); return typeBaseline; }
+  function measureTypeBaseline() {
+    var N = 4096, seed = 20261009, acc = {}, keys = TRAIT_KEYS.concat(['chaos']).concat(LAYOUT_ORDER.map(function (k) { return 'layout:' + k; }));
+    var next = function () { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed; };   // fixed-seed generator: same sample everywhere
+    PERSONALITY_ORDER.forEach(function (id) { acc[id] = { n: 0, sum: {}, sq: {} }; keys.forEach(function (k) { acc[id].sum[k] = 0; acc[id].sq[k] = 0; }); });
+    for (var i = 0; i < N; i++) {
+      var answers = QUESTIONS.map(function () { return (next() >>> 16) & 3; });
+      var r = computeResult(answers), a = acc[r.id];
+      a.n++;
+      keys.forEach(function (k) {
+        var v = k === 'chaos' ? r.chaos : (k.indexOf('layout:') === 0 ? layoutAffinity(r.traits, k.slice(7)) : r.traits[k]);
+        a.sum[k] += v; a.sq[k] += v * v;
+      });
+    }
+    var out = {};
+    PERSONALITY_ORDER.forEach(function (id) {
+      var a = acc[id], n = Math.max(1, a.n); out[id] = {};
+      keys.forEach(function (k) { var m = a.sum[k] / n; out[id][k] = { mean: m, sd: Math.sqrt(Math.max(1e-9, a.sq[k] / n - m * m)) || 1 }; });
+    });
+    return out;
+  }
+
+  function buildProfile(answers) {
+    var r = computeResult(answers), P = PERSONALITIES[r.id], base = getTypeBaseline()[r.id], n = r.traits;
+    var z = function (key, value) { var b = base[key]; return (value - b.mean) / (b.sd || 1); };
+
+    // Secondary trait: where they most exceed their type. Weakest: where they lag most.
+    // Both must also hold in plain terms, so a line can never contradict the answers:
+    // a secondary trait needs a real score (25% of its maximum or more), a weak one a low score (20% or less).
+    var others = TRAIT_KEYS.filter(function (k) { return k !== P.signature; });
+    var pick = function (keys, score, wantHigh) {
+      var best = null, bestV = wantHigh ? -Infinity : Infinity;
+      keys.forEach(function (k) { var v = score(k); if (wantHigh ? v > bestV + 1e-9 : v < bestV - 1e-9) { bestV = v; best = k; } });
+      return best;
+    };
+    var zOf = function (k) { return z(k, n[k]); }, plain = function (k) { return n[k]; };
+    var secondary = pick(others.filter(function (k) { return n[k] >= 0.25; }), zOf, true) || pick(others, plain, true);
+    var weakest = pick(others.filter(function (k) { return k !== secondary && n[k] <= 0.2; }), zOf, false) || pick(others.filter(function (k) { return k !== secondary; }), plain, false);
+
+    var chaosZ = z('chaos', r.chaos);
+    var hash = answers.reduce(function (s, choice, qi) { return s + (qi + 1) * (choice + 1); }, 0);   // only breaks ties between equally fitting lines
+
+    // Receipts: the answer that did most to make them this personality, then the one behind their secondary trait.
+    var w = P.weights, first = 0, firstV = -Infinity, second = -1, secondV = 0;
+    answers.forEach(function (choice, qi) {
+      var t = QUESTIONS[qi].answers[choice].traits;
+      var v = Object.keys(t).reduce(function (s, k) { return s + (w[k] || 0) * t[k] / TRAIT_MAX[k]; }, 0);
+      if (v > firstV + 1e-9) { firstV = v; first = qi; }
+    });
+    answers.forEach(function (choice, qi) {
+      if (qi === first) return;
+      var v = QUESTIONS[qi].answers[choice].traits[secondary] || 0;
+      if (v > secondV) { secondV = v; second = qi; }
+    });
+    var receipts = [QUESTIONS[first].answers[answers[first]].receipt];
+    if (second >= 0 && secondV >= 2) receipts.push(QUESTIONS[second].answers[answers[second]].receipt);
+
+    var roast = r.chaos >= 90 ? LEVEL_ROASTS.chaosHigh
+      : r.chaos <= 8 ? LEVEL_ROASTS.chaosLow
+      : r.creativity >= 93 ? LEVEL_ROASTS.creativityHigh
+      : r.creativity <= 10 ? LEVEL_ROASTS.creativityLow
+      : ROASTS[weakest][hash % ROASTS[weakest].length];
+
+    // Card layout: the style they lean toward more than others of their type.
+    var layout = LAYOUT_ORDER[0], lBest = -Infinity;
+    LAYOUT_ORDER.forEach(function (key) {
+      var v = z('layout:' + key, layoutAffinity(n, key));
+      if (v > lBest + 1e-9) { lBest = v; layout = key; }
+    });
+
+    var intro = P.intros[FAMILY[secondary]];
+    return {
+      id: r.id, scores: r.scores, traits: n, chaos: r.chaos, creativity: r.creativity,
+      secondary: secondary, weakest: weakest,
+      edition: EDITIONS[secondary][chaosZ >= 0 ? 0 : 1],
+      label: P.labels[chaosZ > 0.5 ? 'hi' : (chaosZ < -0.5 ? 'lo' : 'mid')],
+      intro: intro, receipts: receipts, twist: TWISTS[secondary], roast: roast,
+      description: intro + ' ' + receipts[0],
+      strengthPlus: STRENGTH_PLUS[secondary], weaknessPlus: WEAKNESS_PLUS[weakest],
+      layout: layout
+    };
+  }
+
+  /* ------------------------------------------------------------------
+     10. STATE + STORAGE (localStorage only; nothing is sent anywhere)
+     order   the shuffled question order for this session (question indexes)
+     answers one entry per question, indexed by question (not by position)
+     pos     where the participant is in `order`
+     ------------------------------------------------------------------ */
+  function blankAnswers() { return QUESTIONS.map(function () { return null; }); }
+  var state = { screen: 'landing', nick: '', team: '', order: null, lastOrder: null, answers: blankAnswers(), pos: 0, muted: false, result: null };
+
+  // Uniform whole number from 0 to n - 1.
+  function randomInt(n) {
+    try {
+      if (window.crypto && window.crypto.getRandomValues) {
+        var buf = new Uint32Array(1), limit = Math.floor(4294967296 / n) * n;
+        do { window.crypto.getRandomValues(buf); } while (buf[0] >= limit);     // reject the uneven tail
+        return buf[0] % n;
+      }
+    } catch (e) { /* fall through */ }
+    return Math.floor(Math.random() * n);
+  }
+  // Fisher–Yates shuffle of the question indexes. `avoid` is the previous order, so a retake never repeats it.
+  function shuffledOrder(avoid) {
+    var order, tries = 0;
+    do {
+      order = QUESTIONS.map(function (_, i) { return i; });
+      for (var i = order.length - 1; i > 0; i--) {
+        var j = randomInt(i + 1), tmp = order[i];
+        order[i] = order[j]; order[j] = tmp;
+      }
+    } while (avoid && order.join() === avoid.join() && ++tries < 8);
+    return order;
+  }
+  function isValidOrder(o) {
+    if (!Array.isArray(o) || o.length !== QUESTIONS.length) return false;
+    var seen = {};
+    for (var i = 0; i < o.length; i++) { if (typeof o[i] !== 'number' || o[i] % 1 !== 0 || o[i] < 0 || o[i] >= o.length || seen[o[i]]) return false; seen[o[i]] = 1; }
+    return true;
+  }
 
   function save() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ v: 1, screen: state.screen, nick: state.nick, team: state.team, answers: state.answers, q: state.q, muted: state.muted }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ v: 2, screen: state.screen, nick: state.nick, team: state.team, order: state.order, lastOrder: state.lastOrder, answers: state.answers, pos: state.pos, muted: state.muted }));
     } catch (e) { /* private mode or storage disabled: the quiz still works */ }
   }
   function load() {
     try {
       var d = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-      if (!d || d.v !== 1) return;
+      if (!d || d.v !== 2) return;
       state.nick = cleanText(d.nick, NICK_MAX);
       state.team = cleanText(d.team, TEAM_MAX);
       state.muted = !!d.muted;
-      if (Array.isArray(d.answers) && d.answers.length === QUESTIONS.length) {
-        state.answers = d.answers.map(function (a) { return (a === 0 || a === 1 || a === 2 || a === 3) ? a : null; });
+      if (isValidOrder(d.lastOrder)) state.lastOrder = d.lastOrder;
+      if (isValidOrder(d.order)) {
+        state.order = d.order;
+        if (Array.isArray(d.answers) && d.answers.length === QUESTIONS.length) {
+          state.answers = d.answers.map(function (a) { return (a === 0 || a === 1 || a === 2 || a === 3) ? a : null; });
+        }
+        state.pos = clamp(d.pos | 0, 0, QUESTIONS.length - 1);
+        state.savedScreen = d.screen;
+      } else if (d.screen === 'intro') {
+        state.savedScreen = 'intro';
       }
-      state.q = clamp(d.q | 0, 0, QUESTIONS.length - 1);
-      state.savedScreen = d.screen;
     } catch (e) { /* ignore corrupted data */ }
   }
   function cleanText(v, max) {
-    return String(v == null ? '' : v).replace(/[\u0000-\u001F\u007F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
+    return String(v == null ? '' : v).replace(/[\x00-\x1F\x7F]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
   }
   var allAnswered = function () { return state.answers.every(function (a) { return a !== null; }); };
+  // First position in this session's order that has no answer yet (or the last position when all are answered).
+  function firstUnansweredPos() {
+    for (var p = 0; p < state.order.length; p++) if (state.answers[state.order[p]] === null) return p;
+    return state.order.length - 1;
+  }
 
   /* ------------------------------------------------------------------
-     9. SOUND (tiny synth, starts only after a tap, mutable)
+     11. SOUND (tiny synth, starts only after a tap, mutable)
      ------------------------------------------------------------------ */
   var Sound = (function () {
     var ctx = null, master = null;
@@ -1142,7 +1624,7 @@ main { position: relative; z-index: 1; }
   })();
 
   /* ------------------------------------------------------------------
-     10. SHAPES: the fused-dots path used in the background, the progress
+     12. SHAPES: the fused-dots path used in the background, the progress
      dots, the meters and the card. Two circles of radius r, centres (0,0)
      and (d,0), joined by a neck whose half-thickness is h.
      ------------------------------------------------------------------ */
@@ -1169,7 +1651,7 @@ main { position: relative; z-index: 1; }
   }
 
   /* ------------------------------------------------------------------
-     11. THEME + BACKGROUND SCENES
+     13. THEME + BACKGROUND SCENES
      ------------------------------------------------------------------ */
   var rootStyle = document.documentElement.style;
   var currentScene = null;
@@ -1193,7 +1675,17 @@ main { position: relative; z-index: 1; }
     });
   }
   function publishColours() {
-    Object.keys(C).forEach(function (name) { rootStyle.setProperty('--' + name, C[name]); });
+    Object.keys(C).forEach(function (name) {
+      rootStyle.setProperty('--' + name.replace(/[A-Z]/g, function (m) { return '-' + m.toLowerCase(); }), C[name]);
+    });
+  }
+  // The brand motif (dot + fused pair, the rhythm of the logo) as a repeatable strip for CSS.
+  // It is used as a mask, so each strip takes whatever colour its element has.
+  function publishMotif() {
+    var r = 5, gap = 12, w = r * 2 + gap + r * 4.56 + gap, h = r * 2;
+    var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='" + w + "' height='" + h + "' viewBox='0 0 " + w + ' ' + h + "'>" +
+      "<circle cx='" + r + "' cy='" + r + "' r='" + r + "'/><path transform='translate(" + (r * 3 + gap) + ' ' + r + ")' d='" + bridgePath(r, r * 2.56, r * 0.34) + "'/></svg>";
+    rootStyle.setProperty('--motif', 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")');
   }
   function initShapes() {
     // Proportions taken from the logo's fused pair: gap between circles ≈ 0.56 r, neck ≈ 0.34 r.
@@ -1204,7 +1696,7 @@ main { position: relative; z-index: 1; }
   }
 
   /* ------------------------------------------------------------------
-     12. STRETCH TYPE: measures the variable display font so a line can be
+     14. STRETCH TYPE: measures the variable display font so a line can be
      set to an exact width by moving its width axis (50–150).
      ------------------------------------------------------------------ */
   var Stretch = (function () {
@@ -1303,7 +1795,7 @@ main { position: relative; z-index: 1; }
   }
 
   /* ------------------------------------------------------------------
-     13. SCREEN NAVIGATION CONTROLLER
+     15. SCREEN NAVIGATION CONTROLLER
      ------------------------------------------------------------------ */
   var screens = {}, activeScreen = null, navLock = false;
   function show(name, opts) {
@@ -1320,6 +1812,7 @@ main { position: relative; z-index: 1; }
       next.classList.add('is-active');
       if (opts.instant) { void next.offsetWidth; next.style.transition = ''; }
       activeScreen = name; state.screen = name; save();
+      document.documentElement.setAttribute('data-screen', name);   // lets the stylesheet adapt the brand lockup per screen
       if (opts.onShown) opts.onShown();
       if (opts.focus !== false) {
         var h = next.querySelector('[tabindex="-1"]');
@@ -1333,7 +1826,7 @@ main { position: relative; z-index: 1; }
   }
 
   /* ------------------------------------------------------------------
-     14. TOAST, SAVE SHEET, CONFETTI
+     16. TOAST, SAVE SHEET, CONFETTI
      ------------------------------------------------------------------ */
   var toastTimer = 0;
   function toast(text, title, ms) {
@@ -1392,7 +1885,7 @@ main { position: relative; z-index: 1; }
   }
 
   /* ------------------------------------------------------------------
-     15. INTRO FORM
+     17. INTRO FORM
      ------------------------------------------------------------------ */
   function initIntro() {
     var nick = $('nick'), team = $('team');
@@ -1410,38 +1903,40 @@ main { position: relative; z-index: 1; }
         Sound.error(); nick.focus(); return;
       }
       state.nick = n; state.team = t; state.result = null;
+      // A new quiz session gets its own question order. Coming back to this form mid-session keeps the same order.
+      if (!state.order) { state.order = shuffledOrder(state.lastOrder); state.answers = blankAnswers(); state.pos = 0; }
       Sound.pick();
       nick.blur(); team.blur();
-      startQuiz(firstUnanswered());
+      startQuiz(firstUnansweredPos());
     });
     $('introBack').addEventListener('click', function () { if (navLock) return; Sound.back(); show('landing', { onShown: Kinetic.start }); });
   }
-  function firstUnanswered() {
-    var i = state.answers.indexOf(null);
-    return i === -1 ? QUESTIONS.length - 1 : i;
-  }
 
   /* ------------------------------------------------------------------
-     16. QUIZ
+     18. QUIZ
+     state.pos is the position on screen (0–9); state.order[state.pos] is
+     the question shown there.
      ------------------------------------------------------------------ */
   var quizBusy = false;
-  function startQuiz(index) {
-    state.q = clamp(index, 0, QUESTIONS.length - 1);
+  function sceneFor(pos) { return 'q' + (pos % QUIZ_SCENES); }
+  function startQuiz(pos) {
+    state.pos = clamp(pos, 0, QUESTIONS.length - 1);
     renderQuestion(false);
-    show('quiz', { scene: 'q' + state.q });
+    show('quiz', { scene: sceneFor(state.pos) });
   }
 
   function renderProgress(animateLink) {
-    var host = $('progress'), R = 8, STEP = 30, n = QUESTIONS.length, q = state.q;
+    var host = $('progress'), R = 7, STEP = 22, n = QUESTIONS.length, q = state.pos;
     host.textContent = '';
     var svg = svgEl('svg', { viewBox: '-2 -2 ' + ((n - 1) * STEP + R * 2 + 4) + ' ' + (R * 2 + 4), 'aria-hidden': 'true' });
     var links = [];
     for (var i = 0; i < n; i++) {
       var cx = R + i * STEP;
-      if (i < q) links.push(svg.appendChild(svgEl('path', { 'class': 'p-on', transform: 'translate(' + cx + ' ' + R + ')', d: bridgePath(R, STEP, 2.8) })));
+      if (i < q) links.push(svg.appendChild(svgEl('path', { 'class': 'p-on', transform: 'translate(' + cx + ' ' + R + ')', d: bridgePath(R, STEP, 2.4) })));
       svg.appendChild(svgEl('circle', { 'class': i < q ? 'p-on' : (i === q ? 'p-now' : 'p-off'), cx: cx, cy: R, r: i > q ? R - 1.25 : R }));
     }
     host.appendChild(svg);
+    host.setAttribute('aria-valuemax', n);
     host.setAttribute('aria-valuenow', q + 1);
     host.setAttribute('aria-valuetext', 'Question ' + (q + 1) + ' of ' + n);
     // The newest link grows like the two dots in the logo fusing together.
@@ -1449,28 +1944,29 @@ main { position: relative; z-index: 1; }
       var last = links[links.length - 1], t0 = performance.now();
       (function grow(now) {
         var t = clamp((now - t0) / 420, 0, 1), e = 1 - Math.pow(1 - t, 3);
-        last.setAttribute('d', bridgePath(R, STEP, 0.02 + 2.78 * e));
+        last.setAttribute('d', bridgePath(R, STEP, 0.02 + 2.38 * e));
         if (t < 1) requestAnimationFrame(grow);
       })(t0);
     }
   }
 
   function renderQuestion(animate, grewForward) {
-    var stage = $('quizStage'), qi = state.q, Q = QUESTIONS[qi], picked = state.answers[qi];
+    var stage = $('quizStage'), pos = state.pos, qid = state.order[pos], Q = QUESTIONS[qid], picked = state.answers[qid], total = QUESTIONS.length;
     stage.textContent = '';
     stage.className = 'q';
 
     var count = document.createElement('p'); count.className = 'q__count'; count.setAttribute('aria-hidden', 'true');
-    var num = document.createElement('span'); num.className = 'q__num'; num.textContent = pad2(qi + 1);
-    var of = document.createElement('span'); of.className = 'q__of'; of.textContent = '/' + pad2(QUESTIONS.length);
+    var num = document.createElement('span'); num.className = 'q__num'; num.textContent = pad2(pos + 1);
+    var of = document.createElement('span'); of.className = 'q__of'; of.textContent = '/' + pad2(total);
     count.appendChild(num); count.appendChild(of);
 
     var h = document.createElement('h2'); h.className = 'q__text'; h.id = 'qText'; h.tabIndex = -1;
     h.lang = 'ar'; h.dir = 'rtl';
-    var sr = document.createElement('span'); sr.className = 'vh'; sr.lang = 'en'; sr.textContent = 'Question ' + (qi + 1) + ' of ' + QUESTIONS.length + ': ';
+    var sr = document.createElement('span'); sr.className = 'vh'; sr.lang = 'en'; sr.textContent = 'Question ' + (pos + 1) + ' of ' + total + ': ';
     h.appendChild(sr); h.appendChild(document.createTextNode(Q.text));
 
     var list = document.createElement('div'); list.className = 'q__answers'; list.dir = 'rtl'; list.setAttribute('role', 'group'); list.setAttribute('aria-labelledby', 'qText');
+    list.setAttribute('data-question', qid);
     Q.answers.forEach(function (ans, ai) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'answer'; b.dir = 'rtl';
       b.setAttribute('aria-pressed', picked === ai ? 'true' : 'false');
@@ -1486,13 +1982,15 @@ main { position: relative; z-index: 1; }
     });
 
     var foot = document.createElement('div'); foot.className = 'q__foot';
-    var heckle = document.createElement('p'); heckle.className = 'q__heckle'; heckle.textContent = Q.heckle;
-    if (hasArabic(Q.heckle)) { heckle.lang = 'ar'; heckle.dir = 'rtl'; }
+    var line = COPY.heckles[Math.min(pos, COPY.heckles.length - 1)];
+    if (pos === total - 1) line = COPY.heckles[COPY.heckles.length - 1];
+    var heckle = document.createElement('p'); heckle.className = 'q__heckle'; heckle.textContent = line;
+    if (hasArabic(line)) { heckle.lang = 'ar'; heckle.dir = 'rtl'; }
     foot.appendChild(heckle);
     if (picked !== null) {
       // Came back to an answered question: offer a way forward without re-tapping.
       var next = document.createElement('button'); next.type = 'button'; next.className = 'btn q__next';
-      next.textContent = qi === QUESTIONS.length - 1 ? 'See result' : 'Next';
+      next.textContent = pos === total - 1 ? 'See result' : 'Next';
       next.addEventListener('click', function () { if (quizBusy || navLock) return; Sound.tap(); advance(); });
       foot.appendChild(next);
     }
@@ -1505,7 +2003,7 @@ main { position: relative; z-index: 1; }
   function pickAnswer(ai, btn, list) {
     if (quizBusy || navLock) return;               // guards against double taps
     quizBusy = true;
-    state.answers[state.q] = ai; state.result = null; save();
+    state.answers[state.order[state.pos]] = ai; state.result = null; save();
     Array.prototype.forEach.call(list.children, function (b) { b.classList.remove('is-picked'); b.setAttribute('aria-pressed', 'false'); });
     btn.classList.add('is-picked'); btn.setAttribute('aria-pressed', 'true');
     list.classList.add('is-locked');
@@ -1514,18 +2012,18 @@ main { position: relative; z-index: 1; }
   }
 
   function advance() {
-    if (state.answers[state.q] === null) return;
-    if (state.q >= QUESTIONS.length - 1) { if (allAnswered()) startReveal(); else goToQuestion(firstUnanswered(), true); return; }
-    goToQuestion(state.q + 1, true);
+    if (state.answers[state.order[state.pos]] === null) return;
+    if (state.pos >= QUESTIONS.length - 1) { if (allAnswered()) startReveal(); else goToQuestion(firstUnansweredPos(), true); return; }
+    goToQuestion(state.pos + 1, true);
   }
 
-  function goToQuestion(index, forward) {
+  function goToQuestion(pos, forward) {
     if (quizBusy) return;
     quizBusy = true;
     var stage = $('quizStage');
     var swap = function () {
-      state.q = index; save();
-      applyScene('q' + index);
+      state.pos = pos; save();
+      applyScene(sceneFor(pos));
       renderQuestion(true, forward);
       window.scrollTo(0, 0);
       var h = $('qText'); if (h) { try { h.focus({ preventScroll: true }); } catch (e) { h.focus(); } }
@@ -1540,8 +2038,8 @@ main { position: relative; z-index: 1; }
     $('quizBack').addEventListener('click', function () {
       if (quizBusy || navLock) return;
       Sound.back();
-      if (state.q === 0) { show('intro'); return; }
-      goToQuestion(state.q - 1, false);
+      if (state.pos === 0) { show('intro'); return; }
+      goToQuestion(state.pos - 1, false);
     });
     document.addEventListener('keydown', function (e) {
       if (activeScreen !== 'quiz' || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -1554,12 +2052,12 @@ main { position: relative; z-index: 1; }
   }
 
   /* ------------------------------------------------------------------
-     17. REVEAL (pure theatre: the result is already computed)
+     19. REVEAL (pure theatre: the result is already computed)
      ------------------------------------------------------------------ */
   function startReveal() {
-    var result = computeResult(state.answers);
-    state.result = result;
-    var P = PERSONALITIES[result.id];
+    var profile = buildProfile(state.answers);
+    state.result = profile;
+    var P = PERSONALITIES[profile.id];
     var msg = $('revealMsg'), pct = $('revealPct'), bar = $('revealBar'), pctBox = pct.parentNode, dots = $('revealDots');
     msg.textContent = COPY.reveal[0]; msg.classList.remove('is-final'); pct.textContent = '0'; bar.style.transform = 'scaleX(0)';
     pctBox.style.fontVariationSettings = '"wdth" 50';
@@ -1592,15 +2090,15 @@ main { position: relative; z-index: 1; }
       if (t < 1) { requestAnimationFrame(tick); return; }
       if (finished) return; finished = true;
       links(1);
-      goToResult(P, result);
+      goToResult(P, profile);
     })(t0);
   }
 
-  function goToResult(P, result) {
+  function goToResult(P, profile) {
     var wipe = $('wipe');
     var land = function () {
-      renderResult(result);
-      show('result', { instant: true, theme: P.theme, onShown: function () { fitLockup($('rTitle'), true); animateMeters(result, true); } });
+      renderResult(profile);
+      show('result', { instant: true, theme: P.theme, onShown: function () { fitLockup($('rTitle'), true); animateMeters(profile, true); } });
       Sound.win();
       confetti([P.theme.a1, P.theme.a2, P.theme.a3, P.theme.fg], 0.42);
     };
@@ -1615,7 +2113,7 @@ main { position: relative; z-index: 1; }
   }
 
   /* ------------------------------------------------------------------
-     18. RESULT SCREEN
+     20. RESULT SCREEN
      ------------------------------------------------------------------ */
   function meterSvg(host, filled) {
     var R = 9, STEP = 25, n = 10;
@@ -1644,34 +2142,45 @@ main { position: relative; z-index: 1; }
     });
   }
 
-  function renderResult(result) {
-    var P = PERSONALITIES[result.id];
-    $('rRarity').textContent = P.rarity;
+  function renderResult(profile) {
+    var P = PERSONALITIES[profile.id];
+    $('rRarity').textContent = profile.label;
     $('rNick').textContent = state.nick;
     var team = $('rTeam');
     if (state.team) { team.textContent = state.team; team.hidden = false; } else { team.textContent = ''; team.hidden = true; }
-    buildLockup($('rTitle'), P.titleLines, P.title);
+    buildLockup($('rTitle'), P.titleLines, P.title + ', ' + profile.edition);
+    $('rEdition').textContent = profile.edition;
     var tag = $('rTagline'); tag.textContent = P.tagline;
     if (hasArabic(P.tagline)) { tag.lang = 'ar'; tag.dir = 'rtl'; } else { tag.removeAttribute('lang'); tag.dir = 'ltr'; }
-    $('rDesc').textContent = P.description;
+
+    // Personal story: opening for their flavour of the personality, receipts from their own answers, a closing twist.
+    $('rIntro').textContent = profile.intro;
+    var list = $('rReceipts'); list.textContent = '';
+    profile.receipts.forEach(function (line) { var li = document.createElement('li'); li.textContent = line; list.appendChild(li); });
+    $('rTwist').textContent = profile.twist;
+    $('rRoast').textContent = profile.roast;
     $('rStrength').textContent = P.strength;
+    $('rStrengthPlus').textContent = '+ ' + profile.strengthPlus;
     $('rWeakness').textContent = P.weakness;
+    $('rWeaknessPlus').textContent = '+ ' + profile.weaknessPlus;
+    $('rLayout').textContent = LAYOUT_NAMES[profile.layout] + ' layout, picked from your answers';
     document.title = state.nick + ' is ' + P.title + ' | Hackathon Wrapped';
 
     // Hero artwork: the same drawing code that paints the card.
-    var art = $('resultArt'), actx = art.getContext('2d');
-    actx.clearRect(0, 0, art.width, art.height);
-    drawArt(actx, result.id, P.theme);
+    var art = $('resultArt');
+    drawHero(art.getContext('2d'), profile, P.theme);
 
     $('saveHint').textContent = ENV.ios ? COPY.hintIOS : (ENV.touch ? COPY.hintTouch : COPY.hintDesktop);
-    buildCard(result);
+    buildCard(profile);
   }
 
   function retake() {
     if (navLock) return;
     Sound.tap();
-    state.answers = QUESTIONS.map(function () { return null; });
-    state.q = 0; state.result = null;
+    // A retake is a new session: remember the old order only to avoid repeating it, then clear everything.
+    state.lastOrder = state.order || state.lastOrder;
+    state.order = null; state.answers = blankAnswers();
+    state.pos = 0; state.result = null;
     resetCard();
     document.title = 'Hackathon Wrapped | Tafa3ul Edition';
     $('nick').value = state.nick; $('team').value = state.team;   // kept for convenience
@@ -1679,10 +2188,19 @@ main { position: relative; z-index: 1; }
   }
 
   /* ------------------------------------------------------------------
-     19. ABSTRACT ARTWORK (one drawing per personality, 1080 × 620 box)
-     Shared by the result screen hero and the downloadable card.
+     21. ARTWORK
+     Every personality has three pieces of visual identity:
+       EMBLEM   its illustration, drawn inside a square that runs from
+                -290 to +290 around the centre. Nothing may leave that
+                square, so an emblem can be placed anywhere, at any scale,
+                without ever being cut off.
+       PATTERN  a repeating texture for panels and backgrounds. Patterns
+                are the only thing allowed to run off an edge, because a
+                repeating texture is meant to.
+       GLYPH    a small mark used on stickers.
+     Shared by the result screen and all four card layouts.
      ------------------------------------------------------------------ */
-  var ART_W = 1080, ART_H = 620;
+  var EMBLEM_R = 290;
   var DISPLAY = { 50: 'AnybodyW50', 75: 'AnybodyW75', 100: 'AnybodyW100', 125: 'AnybodyW125', 150: 'AnybodyW150' };
   var FONT_TEXT = '"Alexandria", system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif';
   var displayFont = function (size, wdth) { return '900 ' + size + 'px "' + DISPLAY[wdth || 100] + '", "Arial Black", Impact, sans-serif'; };
@@ -1691,125 +2209,211 @@ main { position: relative; z-index: 1; }
   var G = {
     dot: function (c, x, y, r, fill) { c.beginPath(); c.arc(x, y, r, 0, TAU); c.fillStyle = fill; c.fill(); },
     ring: function (c, x, y, r, w, stroke, dash) { c.save(); c.beginPath(); c.arc(x, y, r, 0, TAU); c.lineWidth = w; c.strokeStyle = stroke; if (dash) c.setLineDash(dash); c.stroke(); c.restore(); },
+    // Two fused dots (the logo's motif), centred on (x, y).
+    pair: function (c, x, y, r, rot, fill, gap, neck) { var d = r * (gap || 2.56); c.save(); c.translate(x, y); c.rotate(rot || 0); c.translate(-d / 2, 0); c.fillStyle = fill; c.fill(new Path2D(bridgePath(r, d, r * (neck || 0.34)))); c.restore(); },
     fused: function (c, x, y, r, d, h, rot, fill) { c.save(); c.translate(x, y); c.rotate(rot || 0); c.fillStyle = fill; c.fill(new Path2D(bridgePath(r, d, h))); c.restore(); },
     rr: function (c, x, y, w, h, rad) { rad = Math.min(rad, w / 2, h / 2); c.beginPath(); c.moveTo(x + rad, y); c.arcTo(x + w, y, x + w, y + h, rad); c.arcTo(x + w, y + h, x, y + h, rad); c.arcTo(x, y + h, x, y, rad); c.arcTo(x, y, x + w, y, rad); c.closePath(); },
     star: function (c, x, y, n, R, r, rot, fill) { c.beginPath(); for (var i = 0; i < n * 2; i++) { var a = (rot || 0) + i * Math.PI / n, q = i % 2 ? r : R; c[i ? 'lineTo' : 'moveTo'](x + Math.cos(a) * q, y + Math.sin(a) * q); } c.closePath(); c.fillStyle = fill; c.fill(); },
-    poly: function (c, pts, fill) { c.beginPath(); pts.forEach(function (p, i) { c[i ? 'lineTo' : 'moveTo'](p[0], p[1]); }); c.closePath(); c.fillStyle = fill; c.fill(); },
+    poly: function (c, pts, fill, outline, ow) { c.beginPath(); pts.forEach(function (p, i) { c[i ? 'lineTo' : 'moveTo'](p[0], p[1]); }); c.closePath(); if (outline) { c.lineWidth = ow; c.lineJoin = 'round'; c.strokeStyle = outline; c.stroke(); } c.fillStyle = fill; c.fill(); },
     line: function (c, x1, y1, x2, y2, w, stroke) { c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.lineWidth = w; c.lineCap = 'round'; c.strokeStyle = stroke; c.stroke(); },
-    glyph: function (c, ch, x, y, size, rot, fill, wdth) { c.save(); c.translate(x, y); c.rotate(rot || 0); c.font = displayFont(size, wdth || 100); c.textAlign = 'center'; c.textBaseline = 'alphabetic'; c.direction = 'ltr'; c.fillStyle = fill; c.fillText(ch, 0, size * 0.34); c.restore(); },
-    plus: function (c, x, y, s, w, rot, fill) { c.save(); c.translate(x, y); c.rotate(rot || 0); c.fillStyle = fill; G.rr(c, -s, -w / 2, s * 2, w, w / 2); c.fill(); G.rr(c, -w / 2, -s, w, s * 2, w / 2); c.fill(); c.restore(); }
+    // One display-font character centred on (x, y). `outline` draws a gap around it so it reads on top of other shapes.
+    glyph: function (c, ch, x, y, size, rot, fill, wdth, outline, ow) {
+      c.save(); c.translate(x, y); c.rotate(rot || 0); c.font = displayFont(size, wdth || 100);
+      c.textAlign = 'center'; c.textBaseline = 'alphabetic'; c.direction = 'ltr';
+      if (outline) { c.lineWidth = ow || 14; c.lineJoin = 'round'; c.strokeStyle = outline; c.strokeText(ch, 0, size * 0.34); }
+      c.fillStyle = fill; c.fillText(ch, 0, size * 0.34); c.restore();
+    },
+    plus: function (c, x, y, s, w, rot, fill) { c.save(); c.translate(x, y); c.rotate(rot || 0); c.fillStyle = fill; G.rr(c, -s, -w / 2, s * 2, w, w / 2); c.fill(); G.rr(c, -w / 2, -s, w, s * 2, w / 2); c.fill(); c.restore(); },
+    check: function (c, x, y, s, w, stroke) { c.save(); c.translate(x, y); c.beginPath(); c.moveTo(-0.94 * s, 0.06 * s); c.lineTo(-0.25 * s, 0.75 * s); c.lineTo(s, -0.69 * s); c.lineWidth = w; c.lineCap = 'round'; c.lineJoin = 'round'; c.strokeStyle = stroke; c.stroke(); c.restore(); },
+    bolt: function (c, x, y, s, fill, outline, ow) { G.poly(c, [[x + 46 * s, y], [x - 34 * s, y + 124 * s], [x + 12 * s, y + 124 * s], [x - 40 * s, y + 262 * s], [x + 72 * s, y + 96 * s], [x + 20 * s, y + 96 * s], [x + 78 * s, y]], fill, outline, ow); },
+    // A circle with a bite taken out of it. Drawn with clipping, so it works on any background colour.
+    crescent: function (c, x, y, r, dx, dy, r2, fill) { c.save(); c.beginPath(); c.arc(x, y, r, 0, TAU); c.clip(); c.beginPath(); c.rect(x - r - 2, y - r - 2, r * 2 + 4, r * 2 + 4); c.arc(x + dx, y + dy, r2, 0, TAU, true); c.fillStyle = fill; c.fill('evenodd'); c.restore(); },
+    bubble: function (c, x, y, w, h, fill, tail) { c.fillStyle = fill; G.rr(c, x, y, w, h, h / 2); c.fill(); var tx = tail < 0 ? x + w * 0.24 : x + w * 0.76, k = tail < 0 ? -1 : 1; G.poly(c, [[tx - 34, y + h - 22], [tx + 34, y + h - 22], [tx + k * 46, y + h + 50]], fill); }
   };
 
-  var ART = {
+  // `t` is the personality's theme. `plate` is the colour directly behind the emblem (used for cut-out gaps).
+  var EMBLEM = {
     // Thought loops that never quite close, and the questions that cause them.
-    overthinker: function (c, t) {
-      for (var i = 9; i >= 0; i--) G.ring(c, 730 - i * 13, 350 + i * 6, 40 + i * 40, 8, i % 3 === 2 ? t.a1 : t.fg);
-      G.dot(c, 730, 350, 24, t.a1);
-      G.dot(c, 730 - 4 * 13 + Math.cos(-0.7) * 200, 350 + 24 + Math.sin(-0.7) * 200, 24, t.a2);
-      G.dot(c, 730 - 7 * 13 + Math.cos(2.5) * 320, 350 + 42 + Math.sin(2.5) * 320, 17, t.a1);
-      G.glyph(c, '?', 170, 440, 360, -0.2, t.a1, 100);
-      G.glyph(c, '?', 130, 96, 170, 0.24, t.a2, 150);
-      G.glyph(c, '?', 1000, 110, 110, 0.3, t.fg, 50);
-      [0, 1, 2, 3].forEach(function (i) { G.dot(c, 300 + i * 46, 560 - i * 20, 9 - i * 1.5, t.fg); });
+    overthinker: function (c, t, plate) {
+      for (var i = 6; i >= 0; i--) G.ring(c, 18 - i * 4, -8 + i * 3, 46 + i * 34, 9, i % 3 === 2 ? t.a1 : t.fg);
+      G.dot(c, 18, -8, 22, t.a1);
+      G.dot(c, 6 + Math.cos(-0.7) * 148, 1 + Math.sin(-0.7) * 148, 20, t.a2);
+      G.dot(c, -2 + Math.cos(2.5) * 216, 7 + Math.sin(2.5) * 216, 15, t.a1);
+      G.glyph(c, '?', -166, 148, 262, -0.2, t.a1, 100, plate, 16);
+      G.glyph(c, '?', 206, -206, 112, 0.28, t.a2, 150, plate, 12);
+      G.glyph(c, '?', -226, -196, 96, -0.3, t.fg, 50, plate, 10);
     },
-    // Five to midnight, and that is when the sun comes up.
-    lastMinuteGenius: function (c, t) {
-      c.save(); c.translate(540, 640);
-      for (var i = 0; i < 13; i++) { var a0 = Math.PI + i * (Math.PI / 13), a1 = a0 + Math.PI / 26; c.beginPath(); c.moveTo(0, 0); c.arc(0, 0, 1200, a0, a1); c.closePath(); c.fillStyle = t.a1; c.fill(); }
-      c.restore();
-      var cy = 398;
-      G.dot(c, 540, cy, 190, t.a3); G.dot(c, 540, cy, 172, t.a2);
-      for (var k = 0; k < 12; k++) { var a = k * TAU / 12 - Math.PI / 2; G.dot(c, 540 + Math.cos(a) * 140, cy + Math.sin(a) * 140, k === 0 ? 14 : 8, k === 0 ? t.bg : t.a3); }
-      var hand = function (ang, len, w) { G.line(c, 540, cy, 540 + Math.cos(ang) * len, cy + Math.sin(ang) * len, w, t.a3); };
-      hand(-Math.PI / 2 - 0.06, 76, 20);              // hour hand: nearly 12
-      hand(-Math.PI / 2 - TAU / 12, 122, 13);         // minute hand: 55
-      G.dot(c, 540, cy, 15, t.bg);
-      var bolt = function (x, y, s, fill) { G.poly(c, [[x + 46 * s, y], [x - 34 * s, y + 124 * s], [x + 12 * s, y + 124 * s], [x - 40 * s, y + 262 * s], [x + 72 * s, y + 96 * s], [x + 20 * s, y + 96 * s], [x + 78 * s, y]], fill); };
-      bolt(900, 322, 0.95, t.a3); bolt(150, 372, 0.72, t.a2);
-      G.ring(c, 540, cy, 226, 7, t.a3, [22, 30]);
+    // Five to midnight, which is when the work starts.
+    lastMinuteGenius: function (c, t, plate) {
+      for (var i = 0; i < 14; i++) { var a0 = i * TAU / 14 - TAU / 56; c.beginPath(); c.moveTo(0, 0); c.arc(0, 0, 284, a0, a0 + TAU / 28); c.closePath(); c.fillStyle = t.a1; c.fill(); }
+      G.ring(c, 0, 0, 206, 7, t.a3, [22, 30]);
+      G.dot(c, 0, 0, 172, t.a3); G.dot(c, 0, 0, 156, t.a2);
+      for (var k = 0; k < 12; k++) { var a = k * TAU / 12 - Math.PI / 2; G.dot(c, Math.cos(a) * 126, Math.sin(a) * 126, k === 0 ? 13 : 7.5, k === 0 ? C.orange : t.a3); }
+      var hand = function (ang, len, w) { G.line(c, 0, 0, Math.cos(ang) * len, Math.sin(ang) * len, w, t.a3); };
+      hand(-Math.PI / 2 - 0.06, 68, 19);              // hour hand: nearly 12
+      hand(-Math.PI / 2 - TAU / 12, 110, 12);         // minute hand: 55
+      G.dot(c, 0, 0, 14, C.orange);
+      G.bolt(c, 164, 62, 0.8, t.a3, plate, 14);
+      G.bolt(c, -226, -262, 0.5, t.a3, plate, 10);
     },
     // Everything scattered, everything accounted for.
     chaosCoordinator: function (c, t) {
-      var hub = [540, 356];
-      var nodes = [[130, 120, 'dot', 44, t.a2], [318, 540, 'sq', 76, t.a3], [900, 110, 'tri', 64, t.fg], [972, 470, 'pair', 30, t.a2], [730, 566, 'dot', 34, t.a3], [150, 372, 'dot', 26, t.fg], [420, 96, 'star', 52, t.a1], [706, 150, 'sq', 54, t.a2], [66, 580, 'dot', 62, t.a1]];
-      nodes.forEach(function (n) { G.line(c, hub[0], hub[1], n[0], n[1], 5, t.fg); });
-      G.ring(c, hub[0], hub[1], 150, 5, t.fg, [4, 22]);
+      var nodes = [[-212, -196, 'dot', 40, t.a2], [-242, 36, 'dot', 22, t.fg], [-150, 212, 'sq', 66, t.a3], [36, 246, 'dot', 30, t.a3], [212, 186, 'pair', 25, t.a2], [246, -30, 'dot', 18, t.fg], [216, -204, 'tri', 50, t.fg], [-16, -242, 'star', 40, t.a1], [112, -168, 'sq', 46, t.a2]];
+      nodes.forEach(function (n) { G.line(c, 0, 0, n[0], n[1], 5, t.fg); });
+      G.ring(c, 0, 0, 150, 5, t.fg, [4, 22]);
       nodes.forEach(function (n, i) {
         var x = n[0], y = n[1], s = n[3];
         if (n[2] === 'dot') G.dot(c, x, y, s, n[4]);
         else if (n[2] === 'sq') { c.save(); c.translate(x, y); c.rotate(0.35 + i); c.fillStyle = n[4]; G.rr(c, -s / 2, -s / 2, s, s, s * 0.22); c.fill(); c.restore(); }
         else if (n[2] === 'tri') G.poly(c, [[x, y - s], [x + s * 0.9, y + s * 0.62], [x - s * 0.9, y + s * 0.62]], n[4]);
-        else if (n[2] === 'pair') G.fused(c, x - s * 1.28, y, s, s * 2.56, s * 0.34, -0.5, n[4]);
+        else if (n[2] === 'pair') G.pair(c, x, y, s, -0.5, n[4]);
         else G.star(c, x, y, 8, s, s * 0.52, 0.2, n[4]);
       });
-      G.dot(c, hub[0], hub[1], 96, t.fg); G.dot(c, hub[0], hub[1], 80, t.a1);
-      c.save(); c.translate(hub[0], hub[1]); c.beginPath(); c.moveTo(-30, 2); c.lineTo(-8, 24); c.lineTo(32, -22); c.lineWidth = 17; c.lineCap = 'round'; c.lineJoin = 'round'; c.strokeStyle = t.fg; c.stroke(); c.restore();
+      G.dot(c, 0, 0, 92, t.fg); G.dot(c, 0, 0, 76, t.a1);
+      G.check(c, 0, 0, 32, 17, t.fg);
     },
     // Says nothing. Sees the whole board.
     silentMastermind: function (c, t) {
-      for (var gx = 60; gx < ART_W; gx += 64) for (var gy = 30; gy < ART_H; gy += 64) G.dot(c, gx, gy, 2.6, 'rgba(255,244,223,.2)');
-      [150, 240, 330, 420, 510].forEach(function (r, i) { G.ring(c, 540, 360, r, 3, t.a2, i % 2 ? [3, 16] : null); });
-      G.line(c, 540, -40, 540, 660, 2, t.a2); G.line(c, -40, 360, 1120, 360, 2, t.a2);
-      G.dot(c, 556, 384, 150, t.a1); G.dot(c, 608, 354, 142, t.bg);      // a sliver of moon
-      G.dot(c, 540 + Math.cos(-0.62) * 330, 360 + Math.sin(-0.62) * 330, 15, t.a1);
-      G.ring(c, 540 + Math.cos(-0.62) * 330, 360 + Math.sin(-0.62) * 330, 34, 3, t.a1);
-      G.dot(c, 540 + Math.cos(2.7) * 420, 360 + Math.sin(2.7) * 420, 11, t.a3);
-      G.dot(c, 540 + Math.cos(1.25) * 240, 360 + Math.sin(1.25) * 240, 8, t.fg);
+      for (var gx = -270; gx <= 270; gx += 60) for (var gy = -270; gy <= 270; gy += 60) G.dot(c, gx, gy, 2.6, 'rgba(255,244,223,.22)');
+      [124, 196, 268].forEach(function (r, i) { G.ring(c, 0, 0, r, 3, t.a2, i === 1 ? [3, 16] : null); });
+      G.line(c, -282, 0, 282, 0, 2, t.a2); G.line(c, 0, -282, 0, 282, 2, t.a2);
+      G.crescent(c, 0, 0, 122, 46, -28, 114, t.a1);      // a sliver of moon
+      var px = Math.cos(-0.62) * 268, py = Math.sin(-0.62) * 268;
+      G.dot(c, px, py, 14, t.a1); G.ring(c, px, py, 30, 3, t.a1);
+      G.dot(c, Math.cos(2.7) * 268, Math.sin(2.7) * 268, 10, t.a3);
+      G.dot(c, Math.cos(1.25) * 196, Math.sin(1.25) * 196, 7, t.fg);
     },
     // One thought, several bubbles.
     ceoOfYapping: function (c, t) {
-      var bubble = function (x, y, w, h, fill, tail) {
-        c.fillStyle = fill; G.rr(c, x, y, w, h, h / 2); c.fill();
-        var tx = tail > 0 ? x + w * 0.2 : x + w * 0.8, d = tail > 0 ? -1 : 1;
-        G.poly(c, [[tx, y + h - 20], [tx + 70 * -d, y + h - 20], [tx + 20 * d, y + h + 62]], fill);
-      };
-      bubble(470, 16, 540, 150, t.a2, 1);
-      c.save(); c.font = displayFont(70, 125); c.fillStyle = t.a3; c.textAlign = 'center'; c.textBaseline = 'alphabetic'; c.direction = 'ltr'; c.fillText('BLA BLA', 740, 116); c.restore();
-      bubble(60, 322, 560, 232, t.a1, 1);
-      [0, 1, 2].forEach(function (i) { G.dot(c, 232 + i * 108, 438, 32, t.fg); });
-      G.dot(c, 884, 444, 106, t.a3); G.poly(c, [[812, 506], [884, 540], [772, 584]], t.a3);
-      c.save(); c.font = displayFont(104, 75); c.fillStyle = t.fg; c.textAlign = 'center'; c.textBaseline = 'alphabetic'; c.direction = 'ltr'; c.fillText('BLA', 884, 480); c.restore();
-      [0, 1, 2].forEach(function (i) { c.beginPath(); c.arc(664, 438, 40 + i * 30, -0.62, 0.62); c.lineWidth = 11; c.lineCap = 'round'; c.strokeStyle = t.fg; c.stroke(); });
+      var label = function (text, x, y, size, wdth, fill) { c.save(); c.font = displayFont(size, wdth); c.fillStyle = fill; c.textAlign = 'center'; c.textBaseline = 'alphabetic'; c.direction = 'ltr'; c.fillText(text, x, y); c.restore(); };
+      G.bubble(c, -34, -274, 312, 140, t.a2, -1); label('BLA BLA', 122, -186, 50, 125, t.a3);
+      G.bubble(c, -284, -56, 400, 194, t.a1, -1);
+      [0, 1, 2].forEach(function (i) { G.dot(c, -174 + i * 90, 41, 26, t.fg); });
+      G.dot(c, 178, 160, 100, t.a3); G.poly(c, [[106, 224], [170, 252], [78, 284]], t.a3); label('BLA', 178, 192, 92, 75, t.fg);
+      [0, 1, 2].forEach(function (i) { c.beginPath(); c.arc(150, -40, 26 + i * 24, -0.6, 0.6); c.lineWidth = 10; c.lineCap = 'round'; c.strokeStyle = t.fg; c.stroke(); });
     },
     // They do not stop arriving.
-    ideaMachine: function (c, t) {
-      G.star(c, 300, 420, 14, 250, 168, 0.1, t.a1);
-      G.dot(c, 300, 420, 98, C.cream); G.star(c, 300, 420, 4, 70, 19, 0, t.fg);
-      G.star(c, 872, 440, 10, 150, 84, 0.3, t.a2); G.dot(c, 872, 440, 28, t.bg);
-      G.star(c, 590, 132, 8, 104, 50, 0.1, t.a3);
-      G.star(c, 640, 380, 4, 46, 10, 0.4, t.fg); G.star(c, 1010, 250, 4, 30, 7, 0.2, t.fg);
-      G.star(c, 86, 110, 4, 40, 9, 0.3, t.fg); G.star(c, 604, 560, 4, 26, 6, 0, t.fg); G.star(c, 980, 90, 4, 34, 8, 0, t.fg);
-      [[80, 590, 14], [700, 250, 9], [470, 60, 12], [1030, 590, 8]].forEach(function (d) { G.dot(c, d[0], d[1], d[2], t.fg); });
+    ideaMachine: function (c, t, plate) {
+      G.star(c, -72, 44, 14, 204, 138, 0.1, t.a1);
+      G.dot(c, -72, 44, 82, C.cream); G.star(c, -72, 44, 4, 60, 16, 0, t.fg);
+      G.star(c, 170, -158, 10, 110, 60, 0.3, t.a2); G.dot(c, 170, -158, 22, plate);
+      G.star(c, 190, 190, 8, 80, 40, 0.1, t.a3);
+      G.star(c, 128, 18, 4, 36, 9, 0.4, t.fg); G.star(c, -232, -214, 4, 34, 8, 0.3, t.fg); G.star(c, -8, -238, 4, 24, 6, 0, t.fg);
+      G.star(c, 22, 262, 4, 20, 5, 0, t.fg); G.star(c, 262, 26, 4, 18, 5, 0.2, t.fg);
+      [[-252, 250, 12], [58, -62, 8], [-110, -196, 7]].forEach(function (d) { G.dot(c, d[0], d[1], d[2], t.fg); });
     },
-    // Twenty-three boxes ticked. One to go, and it is being watched.
+    // Fifteen boxes ticked. One to go, and it is being watched.
     humanChecklist: function (c, t) {
-      var fills = [t.a1, t.a1, t.a2, t.a1, t.a3, t.a1, t.a1, t.a3, t.a1, t.a1, t.a2, t.a1, t.a3, t.a1, t.a1, t.a2, t.a1, t.a1, t.a1, t.a2, t.a1, t.a3, t.a1];
-      for (var r = 0; r < 4; r++) for (var col = 0; col < 6; col++) {
-        var x = 90 + col * 156, y = 14 + r * 150, i = r * 6 + col;
-        if (i === 23) { c.save(); G.rr(c, x + 5, y + 5, 110, 110, 24); c.lineWidth = 10; c.strokeStyle = t.fg; c.setLineDash([20, 16]); c.stroke(); c.restore(); continue; }
-        c.fillStyle = fills[i]; G.rr(c, x, y, 120, 120, 28); c.fill();
-        c.beginPath(); c.moveTo(x + 32, y + 62); c.lineTo(x + 53, y + 83); c.lineTo(x + 90, y + 40); c.lineWidth = 16; c.lineCap = 'round'; c.lineJoin = 'round'; c.strokeStyle = t.bg; c.stroke();
+      var fills = [t.a1, t.a1, t.a2, t.a1, t.a3, t.a1, t.a1, t.a2, t.a1, t.a2, t.a1, t.a3, t.a1, t.a3, t.a1];
+      for (var r = 0; r < 4; r++) for (var col = 0; col < 4; col++) {
+        var x = -278 + col * 146, y = -278 + r * 146, i = r * 4 + col;
+        if (i === 15) { c.save(); G.rr(c, x + 5, y + 5, 108, 108, 24); c.lineWidth = 10; c.strokeStyle = t.fg; c.setLineDash([20, 16]); c.stroke(); c.restore(); continue; }
+        c.fillStyle = fills[i]; G.rr(c, x, y, 118, 118, 28); c.fill();
+        G.check(c, x + 59, y + 60, 30, 16, C.cream);
       }
     },
     // Two people, one connection, a few plasters.
     teamTherapist: function (c, t) {
-      G.dot(c, 196, 130, 150, 'rgba(255,244,223,.55)');
-      G.fused(c, 330, 402, 168, 430, 60, 0, t.a1);
-      G.plus(c, 330, 402, 66, 36, 0, t.a2); G.ring(c, 760, 402, 70, 26, t.a2);
-      G.fused(c, 780, 96, 46, 122, 16, -0.42, t.a3);
-      c.save(); c.translate(960, 560); c.rotate(-0.5); c.fillStyle = t.a2; G.rr(c, -130, -44, 260, 88, 44); c.fill(); c.fillStyle = 'rgba(27,11,58,.14)'; G.rr(c, -40, -44, 80, 88, 8); c.fill();
-      [[-16, -16], [16, -16], [-16, 16], [16, 16]].forEach(function (p) { G.dot(c, p[0], p[1], 5, t.fg); }); c.restore();
-      G.plus(c, 560, 150, 26, 12, 0.3, t.fg); G.plus(c, 80, 500, 20, 10, 0, t.fg); G.plus(c, 1010, 300, 18, 9, 0.5, t.fg);
-      G.dot(c, 545, 590, 14, t.a3); G.dot(c, 470, 70, 10, t.a3);
+      G.dot(c, -168, -166, 108, 'rgba(255,244,223,.55)');
+      G.fused(c, -148, 44, 132, 296, 48, 0, t.a1);
+      G.plus(c, -148, 44, 54, 30, 0, t.a2); G.ring(c, 148, 44, 58, 22, t.a2);
+      G.pair(c, 128, -212, 34, -0.4, t.a3);
+      c.save(); c.translate(158, 222); c.rotate(-0.35); c.fillStyle = t.a2; G.rr(c, -100, -33, 200, 66, 33); c.fill(); c.fillStyle = 'rgba(27,11,58,.14)'; G.rr(c, -32, -33, 64, 66, 8); c.fill();
+      [[-13, -13], [13, -13], [-13, 13], [13, 13]].forEach(function (p) { G.dot(c, p[0], p[1], 4.5, t.fg); }); c.restore();
+      G.plus(c, -238, 214, 18, 9, 0.3, t.fg); G.plus(c, 16, -122, 15, 8, 0, t.fg); G.plus(c, 260, -72, 14, 7, 0.5, t.fg);
+      G.dot(c, -60, 240, 12, t.a3); G.dot(c, -30, -252, 9, t.a3);
     }
   };
-  function drawArt(c, id, theme) { c.save(); ART[id](c, theme); c.restore(); }
+  // Draws an emblem centred on (cx, cy). At scale 1 it fills a 580 px square.
+  function drawEmblem(c, id, theme, cx, cy, scale, plate) {
+    c.save(); c.translate(cx, cy); c.scale(scale, scale);
+    EMBLEM[id](c, theme, plate || theme.bg);
+    c.restore();
+  }
+
+  // Repeating textures. Motifs (question marks, sparkles, plus signs…) are placed as whole tiles with a margin,
+  // so no motif is ever cut by an edge. Only continuous lines (stripes, grid) run off the edge, as lines do.
+  function tiles(x, y, w, h, stepX, stepY, margin, draw) {
+    var rows = Math.floor((h - margin * 2) / stepY) + 1, cols = Math.floor((w - margin * 2) / stepX) + 1;
+    if (rows < 1 || cols < 1) return;
+    var y0 = y + (h - (rows - 1) * stepY) / 2, x0 = x + (w - (cols - 1) * stepX) / 2;
+    for (var r = 0; r < rows; r++) {
+      var odd = r % 2, n = odd ? cols - 1 : cols;
+      for (var q = 0; q < n; q++) draw(x0 + q * stepX + (odd ? stepX / 2 : 0), y0 + r * stepY, r, q);
+    }
+  }
+  var PATTERN = {
+    overthinker: function (c, col, x, y, w, h) { c.font = displayFont(46, 100); c.fillStyle = col; c.textAlign = 'center'; c.textBaseline = 'alphabetic'; c.direction = 'ltr'; tiles(x, y, w, h, 92, 92, 36, function (px, py) { c.fillText('?', px, py + 16); }); },
+    lastMinuteGenius: function (c, col, x, y, w, h) { c.strokeStyle = col; c.lineWidth = 15; c.lineCap = 'butt'; for (var k = -h; k < w + 60; k += 46) { c.beginPath(); c.moveTo(x + k, y + h + 10); c.lineTo(x + k + h + 20, y - 10); c.stroke(); } },
+    chaosCoordinator: function (c, col, x, y, w, h) { c.fillStyle = col; tiles(x, y, w, h, 84, 82, 32, function (px, py, r, q) { var kind = (r * 2 + q) % 3; if (kind === 0) { c.beginPath(); c.arc(px, py, 11, 0, TAU); c.fill(); } else if (kind === 1) { c.save(); c.translate(px, py); c.rotate(0.5); c.fillRect(-10, -10, 20, 20); c.restore(); } else { c.beginPath(); c.moveTo(px, py - 13); c.lineTo(px + 13, py + 10); c.lineTo(px - 13, py + 10); c.closePath(); c.fill(); } }); },
+    silentMastermind: function (c, col, x, y, w, h) { c.fillStyle = col; tiles(x, y, w, h, 46, 92, 22, function (px, py) { c.beginPath(); c.arc(px, py, 4.5, 0, TAU); c.fill(); }); tiles(x, y + 46, w, h - 92, 46, 92, 22, function (px, py, r) { if (r % 2 === 0) { c.beginPath(); c.arc(px, py, 4.5, 0, TAU); c.fill(); } }); },
+    ceoOfYapping: function (c, col, x, y, w, h) { c.font = displayFont(34, 125); c.fillStyle = col; c.textAlign = 'center'; c.textBaseline = 'alphabetic'; c.direction = 'ltr'; tiles(x, y, w, h, 136, 66, 62, function (px, py) { c.fillText('BLA', px, py + 12); }); },
+    ideaMachine: function (c, col, x, y, w, h) { tiles(x, y, w, h, 92, 90, 32, function (px, py) { G.star(c, px, py, 4, 17, 4.5, 0.2, col); }); },
+    humanChecklist: function (c, col, x, y, w, h) { c.fillStyle = col; for (var px = x + 26; px < x + w; px += 54) c.fillRect(px, y, 3, h); for (var py = y + 26; py < y + h; py += 54) c.fillRect(x, py, w, 3); },
+    teamTherapist: function (c, col, x, y, w, h) { tiles(x, y, w, h, 84, 82, 30, function (px, py) { G.plus(c, px, py, 12, 6, 0, col); }); }
+  };
+  function drawPattern(c, id, theme, x, y, w, h, radius) {
+    c.save();
+    if (radius) G.rr(c, x, y, w, h, radius); else { c.beginPath(); c.rect(x, y, w, h); }
+    c.clip();
+    PATTERN[id](c, theme.pat, x, y, w, h);
+    c.restore();
+  }
+
+  // Small marks for stickers, drawn in one colour inside a circle of radius s.
+  var GLYPH = {
+    overthinker: function (c, s, col) { G.glyph(c, '?', 0, 0, s * 1.9, 0, col, 100); },
+    lastMinuteGenius: function (c, s, col) { var k = s * 0.0072; G.bolt(c, -19 * k, -131 * k, k, col); },
+    chaosCoordinator: function (c, s, col) { G.check(c, 0, 0, s * 0.6, s * 0.3, col); },
+    silentMastermind: function (c, s, col) { G.crescent(c, -s * 0.08, 0, s * 0.74, s * 0.3, -s * 0.18, s * 0.68, col); },
+    ceoOfYapping: function (c, s, col) { [-1, 0, 1].forEach(function (i) { G.dot(c, i * s * 0.5, 0, s * 0.18, col); }); },
+    ideaMachine: function (c, s, col) { G.star(c, 0, 0, 8, s * 0.82, s * 0.42, 0.1, col); },
+    humanChecklist: function (c, s, col) { c.save(); G.rr(c, -s * 0.62, -s * 0.62, s * 1.24, s * 1.24, s * 0.26); c.lineWidth = s * 0.16; c.strokeStyle = col; c.stroke(); c.restore(); G.check(c, 0, s * 0.02, s * 0.36, s * 0.2, col); },
+    teamTherapist: function (c, s, col) { G.plus(c, 0, 0, s * 0.68, s * 0.38, 0, col); }
+  };
+  // A round white sticker carrying the personality's mark.
+  function glyphSticker(c, id, x, y, r, rot, side) {
+    c.save(); c.translate(x, y); c.rotate(rot || 0);
+    G.dot(c, 0, 7, r, side); G.dot(c, 0, 0, r, C.white);
+    c.beginPath(); c.arc(0, 0, r, 0, TAU); c.lineWidth = 5; c.strokeStyle = side; c.stroke();
+    GLYPH[id](c, r * 0.72, C.ink);
+    c.restore();
+  }
+
+  // Result-screen hero: a panel in the personality's tone and pattern with the emblem and a few stickers.
+  // The page shows it as a framed panel, so the pattern is the only thing that reaches its edges.
+  var HERO_W = 1080, HERO_H = 620;
+  function drawHero(c, profile, theme) {
+    var id = profile.id, side = theme.bg === '#150830' ? C.violet : C.ink;
+    var spots = {
+      type:      { x: 770, stickers: [[170, 178, 60, -0.2], [352, 404, 46, 0.25], [150, 470, 40, 0.1]] },
+      geo:       { x: 540, stickers: [[136, 150, 54, -0.15], [948, 468, 58, 0.2], [142, 486, 40, 0.3], [940, 146, 38, -0.25]] },
+      editorial: { x: 310, stickers: [[910, 178, 60, 0.2], [728, 404, 46, -0.25], [930, 470, 40, -0.1]] },
+      sticker:   { x: 540, stickers: [[132, 300, 62, -0.3], [950, 310, 62, 0.3], [198, 508, 36, 0.2], [884, 116, 36, -0.2]] }
+    }[profile.layout] || { x: 540, stickers: [] };
+    c.clearRect(0, 0, HERO_W, HERO_H);
+    c.fillStyle = theme.tone; c.fillRect(0, 0, HERO_W, HERO_H);
+    drawPattern(c, id, theme, 0, 0, HERO_W, HERO_H);
+    spots.stickers.forEach(function (s) { glyphSticker(c, id, s[0], s[1], s[2], s[3], side); });
+    drawEmblem(c, id, theme, spots.x, HERO_H / 2, 0.98, theme.tone);
+  }
 
   /* ------------------------------------------------------------------
-     20. RESULT CARD RENDERER (Canvas, 1080 × 1920)
+     22. RESULT CARD RENDERER (Canvas, 1080 × 1920)
      The on-screen preview is this exact canvas, so preview = download.
+     Four layouts share one set of building blocks; the participant's
+     answers decide which layout they get (see buildProfile).
+       type       bold typography: the title takes over the card
+       geo        abstract geometric: colour blocks and tiles
+       editorial  editorial poster: masthead, cover image, caption
+       sticker    playful collage of stickers, tape and badges
+     Safe area: nothing important above y = 176 (Instagram's header) or
+     outside the 72 px side margins.
      ------------------------------------------------------------------ */
-  var CARD_W = 1080, CARD_H = 1920, CARD_M = 80;
+  var CARD_W = 1080, CARD_H = 1920, CARD_M = 72, CARD_CW = CARD_W - CARD_M * 2;
+
+  // Records where each element was drawn. Only the development test reads this (to prove nothing overlaps or leaves the card).
+  function note(d, name, kind, x, y, w, h) { if (d.audit) d.audit.push({ name: name, kind: kind, x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) }); }
 
   function setDir(c, text) { c.direction = hasArabic(text) ? 'rtl' : 'ltr'; }
   function fitSize(c, text, maxW, weight, maxSize, minSize) {
@@ -1827,13 +2431,22 @@ main { position: relative; z-index: 1; }
     if (line) lines.push(line);
     return lines;
   }
-  // Draws text that hugs the right edge when Arabic and the left edge when English.
-  function drawLines(c, lines, y, lineH) {
-    lines.forEach(function (ln, i) {
-      var rtl = hasArabic(ln);
-      c.direction = rtl ? 'rtl' : 'ltr'; c.textAlign = rtl ? 'right' : 'left';
-      c.fillText(ln, rtl ? CARD_W - CARD_M : CARD_M, y + i * lineH);
-    });
+  // Wraps text into a box, shrinking the type until it fits o.maxLines. Arabic hugs the right edge, English the left.
+  // o: x, y (top), w, size, min, weight, maxLines, color, align, dry (measure only), name (for the audit).
+  function textBlock(c, d, text, o) {
+    var rtl = hasArabic(text), size = o.size, min = o.min || o.size, lines;
+    for (;;) { c.font = textFont(size, o.weight); lines = wrapLines(c, text, o.w); if (lines.length <= (o.maxLines || 99) || size <= min) break; size -= 2; }
+    var lh = size * (rtl ? 1.6 : 1.34), h = lines.length * lh;
+    if (!o.dry) {
+      var align = o.align || (rtl ? 'right' : 'left'), first = o.y + size * (rtl ? 1.04 : 0.88);
+      c.fillStyle = o.color; c.textBaseline = 'alphabetic'; c.textAlign = align;
+      lines.forEach(function (ln, i) {
+        c.direction = hasArabic(ln) ? 'rtl' : 'ltr';
+        c.fillText(ln, align === 'right' ? o.x + o.w : (align === 'center' ? o.x + o.w / 2 : o.x), first + i * lh);
+      });
+      note(d, o.name || 'text', 'text', o.x, o.y, o.w, h);
+    }
+    return { h: h, size: size, lines: lines.length };
   }
   // One line of the display face stretched to exactly `w` pixels: nearest width master + a small horizontal scale.
   function stretchedLine(c, text, x, baseline, w, size, fill) {
@@ -1847,125 +2460,404 @@ main { position: relative; z-index: 1; }
     c.font = displayFont(size, best); c.textAlign = 'left'; c.textBaseline = 'alphabetic'; c.direction = 'ltr'; c.fillStyle = fill;
     c.fillText(text, 0, 0); c.restore();
   }
-  function lockupSize(c, lines, w, maxBlock) {
-    var CAP = 0.675, ADV = 0.78;
-    var size = maxBlock / (CAP + ADV * (lines.length - 1));
+  var CAP = 0.675, ADV = 0.78;           // cap height and line advance of the display face, in em
+  // Largest type size at which every title line still fits the width (never narrower than width-axis 56).
+  function widestSize(c, lines, w) {
+    var size = Infinity;
     lines.forEach(function (ln) {
       c.font = displayFont(100, 50); var e50 = c.measureText(ln).width / 100;
       c.font = displayFont(100, 75); var e75 = c.measureText(ln).width / 100;
-      size = Math.min(size, w / (e50 + 0.24 * (e75 - e50)));          // width-axis 56 is the narrowest we go
+      size = Math.min(size, w / (e50 + 0.24 * (e75 - e50)));
     });
+    return size;
+  }
+  function lockupSize(c, lines, w, maxBlock) {
+    var size = Math.min(maxBlock / (CAP + ADV * (lines.length - 1)), widestSize(c, lines, w));
     return { size: size, height: size * (CAP + ADV * (lines.length - 1)), cap: size * CAP, adv: size * ADV };
   }
-  function sticker(c, x, y, w, h, rot, fill, side, paint) {
-    c.save(); c.translate(x + w / 2, y + h / 2); c.rotate(rot);
-    c.fillStyle = side; G.rr(c, -w / 2, -h / 2 + 9, w, h, h / 2); c.fill();
-    c.fillStyle = fill; G.rr(c, -w / 2, -h / 2, w, h, h / 2); c.fill();
+  function drawLockup(c, d, lines, x, y, w, lock, fill) {
+    lines.forEach(function (ln, i) { stretchedLine(c, ln, x, y + lock.cap + i * lock.adv, w, lock.size, fill); });
+    note(d, 'title', 'text', x, y, w, lock.height);
+  }
+  // A sticker: filled shape with an outline and a hard drop shadow, optionally rotated. `paint` draws its content, centred.
+  function sticker(c, x, y, w, h, rot, fill, side, paint, radius) {
+    var r = radius === undefined ? h / 2 : radius;
+    c.save(); c.translate(x + w / 2, y + h / 2); c.rotate(rot || 0);
+    c.fillStyle = side; G.rr(c, -w / 2, -h / 2 + 9, w, h, r); c.fill();
+    c.fillStyle = fill; G.rr(c, -w / 2, -h / 2, w, h, r); c.fill();
     c.lineWidth = 5; c.strokeStyle = side; c.stroke();
-    paint(c, w, h); c.restore();
+    if (paint) paint(c, w, h);
+    c.restore();
   }
 
-  function drawCard(c, d) {
-    var P = d.personality, T = P.theme, M = CARD_M, CW = CARD_W - M * 2;
-    var darkBg = T.bg === '#150830';
-    var side = darkBg ? C.violet : C.ink;                      // outline colour for stickers
-
-    c.fillStyle = T.bg; c.fillRect(0, 0, CARD_W, CARD_H);
-    c.save(); c.beginPath(); c.rect(0, 0, CARD_W, ART_H); c.clip(); drawArt(c, P.id, T); c.restore();
-
-    // -- Official logo on a white chip (never recoloured, proportions kept) --
-    var lw = 292, lh = lw * d.logo.height / d.logo.width;
-    sticker(c, M - 8, 196, lw + 76, 104, -0.05, C.white, side, function (cc) { cc.drawImage(d.logo, -lw / 2, -lh / 2, lw, lh); });
-
-    // -- Event lockup --
-    sticker(c, CARD_W - M - 296 + 8, 186, 296, 132, 0.045, darkBg ? C.violet : C.ink, side, function (cc) {
+  // -- Brand pieces ------------------------------------------------------
+  // The official logo on a white plate. Never recoloured; the height always follows the file's own proportions.
+  function logoPlate(c, d, x, y, logoW, rot) {
+    var lh = logoW * d.logo.height / d.logo.width, w = logoW + 76, h = Math.round(lh + 64);
+    sticker(c, x, y, w, h, rot, C.white, d.side, function (cc) { cc.drawImage(d.logo, -logoW / 2, -lh / 2, logoW, lh); });
+    note(d, 'logo', 'brand', x, y, w, h + 9);
+    return { w: w, h: h };
+  }
+  // "HACKATHON WRAPPED / Tafa3ul Edition" lockup sticker.
+  function wordmark(c, d, x, y, rot) {
+    sticker(c, x, y, 296, 132, rot, d.dark ? C.violet : C.ink, d.side, function (cc) {
       stretchedLine(cc, 'HACKATHON', -104, -18, 208, 40, C.cream);
       stretchedLine(cc, 'WRAPPED', -104, 14, 208, 40, C.pink);
       cc.font = textFont(19, 800); cc.fillStyle = C.lime; cc.textAlign = 'center'; cc.direction = 'ltr'; cc.fillText('Tafa3ul Edition', 0, 44);
     });
+    note(d, 'wordmark', 'brand', x, y, 296, 141);
+  }
+  // The logo's rhythm (dot, fused pair) repeated as a strip: the brand's signature line.
+  function motifStrip(c, x, y, w, r, color, alpha) {
+    var gap = r * 2.4, unit = r * 2 + gap + r * 4.56 + gap, n = Math.max(1, Math.floor((w + gap) / unit)), start = x + (w - (n * unit - gap)) / 2;
+    c.save(); c.globalAlpha = alpha;
+    for (var i = 0; i < n; i++) { var ux = start + i * unit; G.dot(c, ux + r, y, r, color); G.pair(c, ux + r * 2 + gap + r * 2.28, y, r, 0, color); }
+    c.restore();
+  }
+  function cardFooter(c, d) {
+    var T = d.theme;
+    motifStrip(c, CARD_M, 1796, CARD_CW, 6, T.fg, 0.4);
+    c.fillStyle = T.fg; c.direction = 'ltr'; c.textBaseline = 'alphabetic';
+    c.font = textFont(26, 800); c.textAlign = 'left'; c.fillText('Powered by Tafa3ul Group', CARD_M, 1850);
+    c.font = textFont(26, 500); c.textAlign = 'right'; c.fillText('Hackathon Wrapped', CARD_W - CARD_M, 1850);
+    note(d, 'footer', 'text', CARD_M, 1786, CARD_CW, 72);
+  }
 
-    // -- Rarity sticker, straddling the artwork's lower edge --
-    c.font = displayFont(25, 125); c.direction = 'ltr';
-    var rw = c.measureText(P.rarity).width + 62;
-    sticker(c, CARD_W - M - rw + 6, ART_H - 44, rw, 64, -0.035, T.accent, side, function (cc) {
-      cc.font = displayFont(25, 125); cc.fillStyle = C.ink; cc.textAlign = 'center'; cc.textBaseline = 'alphabetic'; cc.direction = 'ltr'; cc.fillText(P.rarity, 0, 9);
+  // A strip of the personality's pattern across the very top. It sits above Instagram's header line,
+  // so it only ever carries texture, never information.
+  function topStrip(c, d) {
+    c.fillStyle = d.theme.tone; c.fillRect(0, 0, CARD_W, 148);
+    drawPattern(c, d.profile.id, d.theme, 0, 0, CARD_W, 148);
+  }
+
+  // -- Shared content blocks -----------------------------------------------
+  function labelWidth(c, text, size) { c.font = displayFont(size || 25, 125); c.direction = 'ltr'; return c.measureText(text).width + 62; }
+  function labelSticker(c, d, text, x, y, rot, size) {
+    var s = size || 25, w = labelWidth(c, text, s), h = Math.round(s * 2.56);
+    sticker(c, x, y, w, h, rot, d.theme.accent, d.side, function (cc) {
+      cc.font = displayFont(s, 125); cc.fillStyle = C.ink; cc.textAlign = 'center'; cc.textBaseline = 'alphabetic'; cc.direction = 'ltr'; cc.fillText(text, 0, s * 0.36);
     });
-
-    // -- Measure the flowing blocks first so nothing can collide with the meters --
-    var METERS_TOP = 1588, FLOW_TOP = ART_H + 46, FLOW_BOTTOM = METERS_TOP - 34;
-    var nickSize = fitSize(c, d.nick, CW, 900, 86, 44);
-    var nickH = nickSize * 1.24, rowH = 60;
-    var tagSize = 42, tagLines;
-    c.font = textFont(tagSize, 800);
-    if (c.measureText(P.tagline).width > CW) { tagSize = fitSize(c, P.tagline, CW, 800, 42, 36); }
-    tagLines = wrapLines(c, P.tagline, CW);
-    var tagLH = tagSize * 1.36, tagH = tagLines.length * tagLH;
-    var descSize = 38, descLines;
-    for (;;) { c.font = textFont(descSize, 500); descLines = wrapLines(c, P.description, CW); if (descLines.length <= 4 || descSize <= 30) break; descSize -= 2; }
-    var descLH = descSize * 1.66, descH = descLines.length * descLH;
-    var GAP_ROW = 14, GAP_TITLE = 30, GAP_TAG = 38, GAP_DESC = 20;
-    var fixed = nickH + GAP_ROW + rowH + GAP_TITLE + GAP_TAG + tagH + GAP_DESC + descH;
-    var lock = lockupSize(c, P.titleLines, CW, Math.min(392, FLOW_BOTTOM - FLOW_TOP - fixed));
-    var spare = Math.max(0, FLOW_BOTTOM - FLOW_TOP - fixed - lock.height);
-    var lift = Math.min(spare * 0.3, 40), air = Math.min(spare * 0.35, 46);   // spread leftover space
-
-    // -- Nickname --
-    var y = FLOW_TOP + lift;
-    c.font = textFont(nickSize, 900); c.fillStyle = T.fg; c.textBaseline = 'alphabetic';
-    setDir(c, d.nick); c.textAlign = 'left'; c.fillText(d.nick, M, y + nickSize * 0.9);
-    y += nickH + GAP_ROW;
-
-    // -- Team pill (only when a team was entered) + "is officially" --
-    var x = M;
+    note(d, 'label', 'text', x, y, w, h + 9);
+    return w;
+  }
+  function editionPill(c, d, text, x, y, rot, fill, ink) {
+    c.font = displayFont(26, 125); c.direction = 'ltr';
+    var w = c.measureText(text.toUpperCase()).width + 60, h = 60;
+    sticker(c, x, y, w, h, rot, fill, d.side, function (cc) {
+      cc.font = displayFont(26, 125); cc.fillStyle = ink; cc.textAlign = 'center'; cc.textBaseline = 'alphabetic'; cc.direction = 'ltr'; cc.fillText(text.toUpperCase(), 0, 9);
+    });
+    note(d, 'edition', 'text', x, y, w, h + 9);
+    return { w: w, h: h };
+  }
+  // Nickname, then the optional team pill and "is officially". Returns the height used.
+  // With no team the pill is simply not drawn, so there is never an empty gap.
+  function identity(c, d, x, y, w, o) {
+    o = o || {};
+    var T = d.theme, color = o.color || T.fg, nickSize = fitSize(c, d.nick, w, 900, o.nick || 82, 18), nickH = Math.max(nickSize, 40) * 1.24, rowH = 56;
+    c.fillStyle = color; c.textBaseline = 'alphabetic'; setDir(c, d.nick); c.textAlign = 'left';
+    c.fillText(d.nick, x, y + Math.max(nickSize, 40) * 0.9);
+    note(d, 'nick', 'text', x, y, c.measureText(d.nick).width, nickH);
+    var ry = y + nickH + 10, cx = x, total = nickH + 10 + rowH;
+    c.font = textFont(30, 500); c.direction = 'ltr';
+    var isW = c.measureText('is officially').width;
     if (d.team) {
-      var teamSize = fitSize(c, d.team, CW - 330, 800, 30, 20);
-      var tw = c.measureText(d.team).width + 56;
-      c.save(); G.rr(c, x + 2, y + 2, tw, rowH - 4, rowH / 2); c.lineWidth = 4; c.strokeStyle = T.fg; c.stroke(); c.restore();
-      c.font = textFont(teamSize, 800); c.fillStyle = T.fg; setDir(c, d.team); c.textAlign = 'center';
-      c.fillText(d.team, x + 2 + tw / 2, y + rowH / 2 + teamSize * 0.36);
-      x += tw + 22;
+      var teamSize = fitSize(c, d.team, w - 56, 800, 28, 12), tw = c.measureText(d.team).width + 52;
+      c.save(); G.rr(c, x + 2, ry + 2, tw, rowH - 4, rowH / 2); c.lineWidth = 4; c.strokeStyle = color; c.stroke(); c.restore();
+      c.font = textFont(teamSize, 800); c.fillStyle = color; setDir(c, d.team); c.textAlign = 'center';
+      c.fillText(d.team, x + 2 + tw / 2, ry + rowH / 2 + teamSize * 0.36);
+      note(d, 'team', 'text', x, ry, tw + 4, rowH);
+      if (tw + 22 + isW > w) { ry += rowH + 6; total += rowH + 6; } else cx = x + tw + 22;   // long team name: "is officially" drops to its own line
     }
-    c.font = textFont(32, 500); c.fillStyle = T.fg; c.direction = 'ltr'; c.textAlign = 'left';
-    c.fillText('is officially', x, y + rowH / 2 + 11);
-    y += rowH + GAP_TITLE;
+    c.font = textFont(30, 500); c.fillStyle = color; c.direction = 'ltr'; c.textAlign = 'left';
+    c.fillText('is officially', cx, ry + rowH / 2 + 10);
+    note(d, 'is-officially', 'text', cx, ry + 8, isW, rowH - 16);
+    return total;
+  }
+  // Ten dots; the filled ones fuse together like the pair in the logo.
+  function dotMeter(c, x, cy, w, r, value, on, off) {
+    var step = (w - r * 2) / 9, filled = Math.round(value / 10);
+    for (var k = 0; k < 10; k++) {
+      var cx = x + r + k * step;
+      if (k < filled - 1) G.fused(c, cx, cy, r, step, r * 0.34, 0, on);
+      if (k < filled) G.dot(c, cx, cy, r, on); else G.ring(c, cx, cy, r - 2, Math.max(3, r * 0.24), off);
+    }
+  }
+  function softInk(T) { return T.fg === C.cream ? 'rgba(255,244,223,.5)' : 'rgba(27,11,58,.42)'; }
+  // True for dark colours (#RRGGBB), used to pick a readable ring colour next to them.
+  function isDark(hex) { var v = parseInt(hex.slice(1), 16); return (0.299 * (v >> 16) + 0.587 * ((v >> 8) & 255) + 0.114 * (v & 255)) < 140; }
+  // Label, big percentage and dot meter stacked in a column.
+  function statColumn(c, d, x, y, w, label, value) {
+    var T = d.theme;
+    c.font = displayFont(23, 125); c.fillStyle = T.fg; c.textAlign = 'left'; c.direction = 'ltr'; c.textBaseline = 'alphabetic';
+    c.fillText(label, x, y + 22);
+    c.font = displayFont(96, 100); c.fillStyle = T.title; c.fillText(value + '%', x - 3, y + 112);
+    dotMeter(c, x, y + 154, w, 17, value, T.title, softInk(T));
+    note(d, label, 'text', x, y, w, 172);
+  }
 
-    // -- Personality title: the centrepiece --
-    P.titleLines.forEach(function (ln, i) { stretchedLine(c, ln, M, y + lock.cap + i * lock.adv, CW, lock.size, T.title); });
-    y += lock.height + GAP_TAG + air;
+  /* ---------- Layout 1: BOLD TYPE ---------------------------------------- */
+  function layoutType(c, d) {
+    var T = d.theme, P = d.personality, pr = d.profile, M = CARD_M, CW = CARD_CW;
+    c.fillStyle = T.bg; c.fillRect(0, 0, CARD_W, CARD_H);
+    topStrip(c, d);
+    logoPlate(c, d, M - 6, 190, 292, -0.05);
+    wordmark(c, d, CARD_W - M - 296 + 6, 184, 0.045);
+    labelSticker(c, d, pr.label, M, 342, -0.02);
 
-    // -- Tagline --
-    c.font = textFont(tagSize, 800); c.fillStyle = T.fg; c.textBaseline = 'alphabetic';
-    drawLines(c, tagLines, y + tagSize * 0.82, tagLH);
-    y += tagH + GAP_DESC + air * 0.5;
+    var idTop = 428, idH = identity(c, d, M, idTop, CW, { nick: 80 });
+    // Measure the text first: the title then takes every pixel that is left.
+    var COL = 566, METERS_TOP = 1588, EDH = 60;
+    var roast = textBlock(c, d, pr.roast, { x: M, y: 0, w: COL, size: 38, min: 28, weight: 800, maxLines: 3, dry: true });
+    var intro = textBlock(c, d, pr.intro, { x: M, y: 0, w: COL, size: 30, min: 24, weight: 500, maxLines: 4, dry: true });
+    var textH = roast.h + 16 + intro.h, zoneH = Math.max(textH, 300);
+    var titleTop = idTop + idH + 30;
+    var avail = METERS_TOP - 34 - zoneH - 30 - EDH - 26 - titleTop;
+    var lock = lockupSize(c, P.titleLines, CW, Math.min(600, avail));
+    var spare = Math.max(0, avail - lock.height), g1 = Math.min(spare * 0.4, 44), g2 = Math.min(spare * 0.3, 36);
+    titleTop += g1;
+    drawLockup(c, d, P.titleLines, M, titleTop, CW, lock, T.title);
+    var ey = titleTop + lock.height + 26;
+    editionPill(c, d, pr.edition, M, ey, -0.025, T.accent, C.ink);
+    var zy = ey + EDH + 30 + g2, ty = zy + (zoneH - textH) / 2;
+    textBlock(c, d, pr.roast, { x: M, y: ty, w: COL, size: 38, min: 28, weight: 800, maxLines: 3, color: T.fg, name: 'roast' });
+    textBlock(c, d, pr.intro, { x: M, y: ty + roast.h + 16, w: COL, size: 30, min: 24, weight: 500, maxLines: 4, color: T.fg, name: 'description' });
+    var es = 300 / (EMBLEM_R * 2), ex = CARD_W - M - 150, eyc = zy + zoneH / 2;
+    drawEmblem(c, pr.id, T, ex, eyc, es, T.bg);
+    note(d, 'emblem', 'art', ex - 150, eyc - 150, 300, 300);
 
-    // -- Description (Arabic, right-to-left) --
-    c.font = textFont(descSize, 500); c.fillStyle = T.fg;
-    drawLines(c, descLines, y + descSize * 1.04, descLH);
-
-    // -- Chaos + Creativity meters --
     var colW = (CW - 40) / 2;
-    [['CHAOS LEVEL', d.chaos], ['CREATIVITY LEVEL', d.creativity]].forEach(function (m, i) {
-      var mx = M + i * (colW + 40), my = METERS_TOP;
-      c.font = displayFont(23, 125); c.fillStyle = T.fg; c.textAlign = 'left'; c.direction = 'ltr'; c.textBaseline = 'alphabetic';
-      c.fillText(m[0], mx, my + 22);
-      c.font = displayFont(96, 100); c.fillStyle = T.title; c.fillText(m[1] + '%', mx - 3, my + 112);
-      var r = 17, step = (colW - r * 2) / 9, filled = Math.round(m[1] / 10), cy = my + 154;
-      for (var k = 0; k < 10; k++) {
-        var cx = mx + r + k * step;
-        if (k < filled - 1) G.fused(c, cx, cy, r, step, r * 0.34, 0, T.title);
-        if (k < filled) G.dot(c, cx, cy, r, T.title); else G.ring(c, cx, cy, r - 2, 4, T.fg === C.cream ? 'rgba(255,244,223,.5)' : 'rgba(27,11,58,.42)');
-      }
-    });
+    statColumn(c, d, M, METERS_TOP, colW, 'CHAOS LEVEL', pr.chaos);
+    statColumn(c, d, M + colW + 40, METERS_TOP, colW, 'CREATIVITY LEVEL', pr.creativity);
+    cardFooter(c, d);
+  }
 
-    // -- Footer --
-    c.fillStyle = T.fg; c.globalAlpha = 0.28; c.fillRect(M, 1796, CW, 4); c.globalAlpha = 1;
-    c.font = textFont(26, 800); c.fillStyle = T.fg; c.direction = 'ltr'; c.textBaseline = 'alphabetic';
-    c.textAlign = 'left'; c.fillText('Powered by Tafa3ul Group', M, 1846);
-    c.font = textFont(26, 500); c.textAlign = 'right'; c.fillText('Hackathon Wrapped', CARD_W - M, 1846);
+  /* ---------- Layout 2: ABSTRACT GEOMETRIC -------------------------------- */
+  function layoutGeo(c, d) {
+    var T = d.theme, P = d.personality, pr = d.profile, M = CARD_M, CW = CARD_CW, BLOCK = 620, BAND = 68;
+    c.fillStyle = T.bg; c.fillRect(0, 0, CARD_W, CARD_H);
+    // Top block: tone + pattern, edge to edge on purpose.
+    c.fillStyle = T.tone; c.fillRect(0, 0, CARD_W, BLOCK);
+    drawPattern(c, pr.id, T, 0, 0, CARD_W, BLOCK);
+    logoPlate(c, d, M - 6, 190, 292, -0.04);
+    identity(c, d, M, 334, 500, { nick: 74 });
+    var es = 0.64, ex = 800, eyc = 364;
+    drawEmblem(c, pr.id, T, ex, eyc, es, T.tone);
+    note(d, 'emblem', 'art', ex - EMBLEM_R * es, eyc - EMBLEM_R * es, EMBLEM_R * 2 * es, EMBLEM_R * 2 * es);
+    var lw = labelWidth(c, pr.label, 23);
+    labelSticker(c, d, pr.label, CARD_W - M - lw + 4, 553, -0.02, 23);
+    // Event band
+    c.fillStyle = T.fg; c.fillRect(0, BLOCK, CARD_W, BAND);
+    stretchedLine(c, 'HACKATHON WRAPPED  /  TAFA3UL EDITION', M, BLOCK + BAND / 2 + 11, CW, 31, T.bg);
+    note(d, 'band', 'brand', M, BLOCK + 8, CW, BAND - 16);
+
+    var TILES_TOP = 1362, TILE_H = 206, ROAST_TOP = 1590, ROAST_H = 166, EDH = 60;
+    var desc = textBlock(c, d, pr.description, { x: M, y: 0, w: CW, size: 31, min: 25, weight: 500, maxLines: 3, dry: true });
+    var titleTop = BLOCK + BAND + 40;
+    var avail = TILES_TOP - 30 - desc.h - 22 - EDH - 24 - titleTop;
+    var lock = lockupSize(c, P.titleLines, CW, Math.min(330, avail));
+    var spare = Math.max(0, avail - lock.height), g = Math.min(spare / 3, 30);
+    titleTop += g;
+    drawLockup(c, d, P.titleLines, M, titleTop, CW, lock, T.title);
+    var ey = titleTop + lock.height + 24;
+    editionPill(c, d, pr.edition, M, ey, -0.02, T.accent, C.ink);
+    textBlock(c, d, pr.description, { x: M, y: ey + EDH + 22 + g, w: CW, size: 31, min: 25, weight: 500, maxLines: 3, color: T.fg, name: 'description' });
+
+    // Two stat tiles
+    var tw = (CW - 24) / 2;
+    [['CHAOS LEVEL', pr.chaos, T.fg, T.bg], ['CREATIVITY LEVEL', pr.creativity, T.accent, C.ink]].forEach(function (m, i) {
+      var tx = M + i * (tw + 24);
+      c.fillStyle = m[2]; G.rr(c, tx, TILES_TOP, tw, TILE_H, 34); c.fill();
+      c.font = displayFont(21, 125); c.fillStyle = m[3]; c.textAlign = 'left'; c.direction = 'ltr'; c.textBaseline = 'alphabetic';
+      c.fillText(m[0], tx + 30, TILES_TOP + 50);
+      c.font = displayFont(96, 100); c.fillText(m[1] + '%', tx + 27, TILES_TOP + 144);
+      c.save(); c.globalAlpha = 1; dotMeter(c, tx + 30, TILES_TOP + 176, tw - 60, 13, m[1], m[3], isDark(m[3]) ? 'rgba(27,11,58,.4)' : 'rgba(255,244,223,.55)'); c.restore();
+      note(d, m[0], 'text', tx, TILES_TOP, tw, TILE_H);
+    });
+    // Roast tile
+    c.fillStyle = T.tone; G.rr(c, M, ROAST_TOP, CW, ROAST_H, 34); c.fill();
+    c.font = displayFont(20, 125); c.fillStyle = T.title; c.textAlign = 'left'; c.direction = 'ltr'; c.textBaseline = 'alphabetic';
+    c.fillText('THE ROAST', M + 30, ROAST_TOP + 44);
+    var rb = textBlock(c, d, pr.roast, { x: M + 30, y: 0, w: CW - 60, size: 34, min: 26, weight: 800, maxLines: 2, dry: true });
+    textBlock(c, d, pr.roast, { x: M + 30, y: ROAST_TOP + 52 + (104 - rb.h) / 2, w: CW - 60, size: 34, min: 26, weight: 800, maxLines: 2, color: T.fg, name: 'roast' });
+    cardFooter(c, d);
+  }
+
+  /* ---------- Layout 3: EDITORIAL POSTER ---------------------------------- */
+  function layoutEditorial(c, d) {
+    var T = d.theme, P = d.personality, pr = d.profile, M = CARD_M, CW = CARD_CW;
+    c.fillStyle = T.bg; c.fillRect(0, 0, CARD_W, CARD_H);
+    topStrip(c, d);
+    logoPlate(c, d, M, 186, 264, 0);
+    c.fillStyle = T.fg; c.direction = 'ltr'; c.textAlign = 'right'; c.textBaseline = 'alphabetic';
+    c.font = displayFont(24, 125); c.fillText('TAFA3UL EDITION', CARD_W - M, 232);
+    c.font = textFont(24, 500); c.fillText('The internal hackathon issue', CARD_W - M, 270);
+    note(d, 'issue', 'brand', 600, 208, 408, 70);
+    // Masthead
+    stretchedLine(c, 'HACKATHON WRAPPED', M, 408, CW, 124, T.title);
+    note(d, 'masthead', 'brand', M, 322, CW, 88);
+    c.fillStyle = T.fg; c.fillRect(M, 428, CW, 6);
+    c.font = displayFont(20, 100); c.textAlign = 'left'; c.fillText('THE PERSONALITY ISSUE', M, 468);
+    c.textAlign = 'right'; c.fillText(pr.label, CARD_W - M, 468);
+    note(d, 'issue-line', 'text', M, 448, CW, 24);
+    c.fillRect(M, 484, CW, 2);
+
+    // Cover image: framed panel with the emblem, roast as the caption
+    var FY = 506, capInner = CW - 64;
+    c.font = textFont(30, 800);
+    var oneLine = fitSize(c, pr.roast, capInner, 800, 30, 24), fitsOne = c.measureText(pr.roast).width <= capInner;
+    var cap = fitsOne ? { h: 78 } : { h: 118 };
+    var FH = 362 + cap.h;
+    c.save(); G.rr(c, M, FY, CW, FH, 34); c.fillStyle = T.tone; c.fill(); c.restore();
+    drawPattern(c, pr.id, T, M, FY, CW, FH, 34);
+    var artH = FH - cap.h, es = Math.min(0.6, (artH - 22) / (EMBLEM_R * 2)), eyc = FY + artH / 2;
+    drawEmblem(c, pr.id, T, CARD_W / 2, eyc, es, T.tone);
+    note(d, 'emblem', 'art', CARD_W / 2 - EMBLEM_R * es, eyc - EMBLEM_R * es, EMBLEM_R * 2 * es, EMBLEM_R * 2 * es);
+    c.save(); G.rr(c, M, FY, CW, FH, 34); c.clip(); c.fillStyle = T.fg; c.fillRect(M, FY + artH, CW, cap.h); c.restore();
+    if (fitsOne) {
+      c.font = textFont(oneLine, 800); c.fillStyle = T.bg; c.textAlign = 'center'; setDir(c, pr.roast); c.textBaseline = 'alphabetic';
+      c.fillText(pr.roast, CARD_W / 2, FY + artH + cap.h / 2 + oneLine * 0.36);
+      note(d, 'roast', 'text', M + 32, FY + artH + 12, capInner, cap.h - 24);
+    } else {
+      var two = textBlock(c, d, pr.roast, { x: M + 32, y: 0, w: capInner, size: 27, min: 22, weight: 800, maxLines: 2, dry: true });
+      textBlock(c, d, pr.roast, { x: M + 32, y: FY + artH + (cap.h - two.h) / 2 - 4, w: capInner, size: 27, min: 22, weight: 800, maxLines: 2, color: T.bg, align: 'center', name: 'roast' });
+    }
+    c.save(); G.rr(c, M, FY, CW, FH, 34); c.lineWidth = 6; c.strokeStyle = T.fg; c.stroke(); c.restore();
+
+    var METERS_TOP = 1666, EDH = 60;
+    var idTop = FY + FH + 26, idH = identity(c, d, M, idTop, CW, { nick: 60 });
+    var desc = textBlock(c, d, pr.description, { x: M, y: 0, w: CW, size: 30, min: 24, weight: 500, maxLines: 3, dry: true });
+    var titleTop = idTop + idH + 22;
+    var avail = METERS_TOP - 26 - desc.h - 20 - EDH - 20 - titleTop;
+    var lock = lockupSize(c, P.titleLines, CW, Math.min(280, avail));
+    var spare = Math.max(0, avail - lock.height), g = Math.min(spare / 3, 24);
+    titleTop += g;
+    drawLockup(c, d, P.titleLines, M, titleTop, CW, lock, T.title);
+    var ey = titleTop + lock.height + 20;
+    editionPill(c, d, pr.edition, M, ey, 0, T.accent, C.ink);
+    textBlock(c, d, pr.description, { x: M, y: ey + EDH + 20 + g, w: CW, size: 30, min: 24, weight: 500, maxLines: 3, color: T.fg, name: 'description' });
+
+    // Compact stat lines
+    var colW = (CW - 40) / 2;
+    [['CHAOS LEVEL', pr.chaos], ['CREATIVITY LEVEL', pr.creativity]].forEach(function (m, i) {
+      var mx = M + i * (colW + 40);
+      c.font = displayFont(19, 125); c.fillStyle = T.fg; c.textAlign = 'left'; c.direction = 'ltr'; c.textBaseline = 'alphabetic';
+      c.fillText(m[0], mx, METERS_TOP + 18);
+      c.font = displayFont(64, 100); c.fillStyle = T.title; c.fillText(m[1] + '%', mx - 2, METERS_TOP + 88);
+      dotMeter(c, mx + 178, METERS_TOP + 64, colW - 178, 11, m[1], T.title, softInk(T));
+      note(d, m[0], 'text', mx, METERS_TOP, colW, 92);
+    });
+    cardFooter(c, d);
+  }
+
+  /* ---------- Layout 4: PLAYFUL STICKERS ---------------------------------- */
+  function layoutSticker(c, d) {
+    var T = d.theme, P = d.personality, pr = d.profile, M = CARD_M, CW = CARD_CW, side = d.side;
+    c.fillStyle = T.bg; c.fillRect(0, 0, CARD_W, CARD_H);
+    drawPattern(c, pr.id, T, 0, 0, CARD_W, CARD_H);            // background texture, edge to edge on purpose
+    logoPlate(c, d, M - 6, 190, 292, -0.06);
+    wordmark(c, d, CARD_W - M - 296 + 4, 184, 0.06);
+    glyphSticker(c, pr.id, 574, 252, 46, 0.2, side);
+
+    // Name tag
+    var tagW = 414, tagH = 192;
+    sticker(c, M + 6, 364, tagW, tagH, -0.07, C.white, side, function (cc, w, h) {
+      cc.save(); G.rr(cc, -w / 2, -h / 2, w, h, 26); cc.clip(); cc.fillStyle = side; cc.fillRect(-w / 2, -h / 2, w, 62); cc.restore();
+      cc.font = displayFont(22, 125); cc.fillStyle = C.cream; cc.textAlign = 'center'; cc.direction = 'ltr'; cc.textBaseline = 'alphabetic'; cc.fillText('HELLO, I AM', 0, -h / 2 + 41);
+      var ns = fitSize(cc, d.nick, w - 52, 900, 70, 14);
+      if (d.audit) d.audit.push({ name: 'nick-text', kind: 'fit', x: 0, y: 0, w: Math.round(cc.measureText(d.nick).width), h: w - 52 });
+      cc.fillStyle = C.ink; setDir(cc, d.nick); cc.textAlign = 'center'; cc.fillText(d.nick, 0, -h / 2 + 62 + (h - 62) / 2 + ns * 0.34);
+    }, 26);
+    note(d, 'nick', 'text', M + 6, 364, tagW, tagH + 9);
+    var rowY = 588;
+    if (d.team) {
+      c.font = textFont(28, 800);
+      var ts = fitSize(c, d.team, 340, 800, 28, 11), tw = c.measureText(d.team).width + 52;
+      sticker(c, M + 24, rowY, tw, 54, 0.035, T.accent, side, function (cc) {
+        cc.font = textFont(ts, 800); cc.fillStyle = C.ink; setDir(cc, d.team); cc.textAlign = 'center'; cc.textBaseline = 'alphabetic'; cc.fillText(d.team, 0, ts * 0.36);
+      });
+      note(d, 'team', 'text', M + 24, rowY, tw, 63);
+      rowY += 76;
+    }
+    c.font = textFont(28, 500); c.direction = 'ltr';
+    var ow = c.measureText('is officially').width + 48;
+    sticker(c, M + 10, rowY, ow, 52, -0.03, d.dark ? C.violet : C.ink, side, function (cc) {
+      cc.font = textFont(28, 500); cc.fillStyle = C.cream; cc.direction = 'ltr'; cc.textAlign = 'center'; cc.textBaseline = 'alphabetic'; cc.fillText('is officially', 0, 10);
+    });
+    note(d, 'is-officially', 'text', M + 10, rowY, ow, 61);
+    glyphSticker(c, pr.id, 430, 716, 38, -0.25, side);
+
+    // Emblem on a tilted plate
+    var px = 752, py = 592, half = 222, es = 0.7;
+    c.save(); c.translate(px, py); c.rotate(0.07);
+    c.fillStyle = side; G.rr(c, -half, -half + 12, half * 2, half * 2, 48); c.fill();
+    c.fillStyle = T.tone; G.rr(c, -half, -half, half * 2, half * 2, 48); c.fill();
+    c.lineWidth = 14; c.strokeStyle = C.white; c.stroke();
+    c.scale(es, es); EMBLEM[pr.id](c, T, T.tone);
+    c.restore();
+    note(d, 'emblem', 'art', px - half - 8, py - half - 8, half * 2 + 16, half * 2 + 28);
+    labelSticker(c, d, pr.label, M + 10, 838, -0.035);
+
+    // Title as stacked blocks
+    var BOTTOM_TOP = 1588, EDH = 58, lines = P.titleLines, n = lines.length, PAD = 30, GAP = 12, titleTop = 916;
+    var desc = textBlock(c, d, pr.description, { x: M + 30, y: 0, w: CW - 60, size: 30, min: 24, weight: 500, maxLines: 3, dry: true });
+    var noteH = desc.h + 50;
+    var avail = BOTTOM_TOP - 30 - noteH - 22 - EDH - 16 - titleTop;
+    var size = Math.min((avail - n * PAD - (n - 1) * GAP) / (CAP * n), widestSize(c, lines, CW - 44));
+    var cap = size * CAP, blockH = cap + PAD, used = n * blockH + (n - 1) * GAP;
+    var spare = Math.max(0, avail - used), g = Math.min(spare / 3, 26);
+    titleTop += g;
+    lines.forEach(function (ln, i) {
+      var by = titleTop + i * (blockH + GAP);
+      c.save(); c.translate(CARD_W / 2, by + blockH / 2); c.rotate(i % 2 ? 0.012 : -0.014);
+      c.fillStyle = side; G.rr(c, -CW / 2, -blockH / 2 + 8, CW, blockH, 20); c.fill();
+      c.fillStyle = T.title; G.rr(c, -CW / 2, -blockH / 2, CW, blockH, 20); c.fill();
+      stretchedLine(c, ln, -CW / 2 + 22, -blockH / 2 + PAD / 2 + cap, CW - 44, size, T.bg);
+      c.restore();
+    });
+    note(d, 'title', 'text', M, titleTop, CW, used + 8);
+    var ey = titleTop + used + 16;
+    editionPill(c, d, pr.edition, M + 8, ey, -0.03, C.white, C.ink);
+
+    // Description on a paper note with a strip of tape
+    var ny = ey + EDH + 22 + g;
+    sticker(c, M, ny, CW, noteH, -0.01, '#FFFDF6', side, null, 22);
+    c.save(); c.translate(CARD_W / 2, ny); c.rotate(0.04); c.globalAlpha = 0.9; c.fillStyle = T.accent === C.cream ? C.coral : T.accent; c.fillRect(-78, -20, 156, 40); c.restore();
+    textBlock(c, d, pr.description, { x: M + 30, y: ny + 22, w: CW - 60, size: 30, min: 24, weight: 500, maxLines: 3, color: C.ink, name: 'description' });
+
+    // Round stat badges + roast in a speech bubble
+    var R = 86, by0 = BOTTOM_TOP + R + 4;
+    [['CHAOS', pr.chaos, M + R + 2], ['CREATIVITY', pr.creativity, M + R * 3 + 24]].forEach(function (m) {
+      var bx = m[2];
+      G.dot(c, bx, by0 + 8, R, side); G.dot(c, bx, by0, R, C.white);
+      c.beginPath(); c.arc(bx, by0, R, 0, TAU); c.lineWidth = 5; c.strokeStyle = side; c.stroke();
+      c.beginPath(); c.arc(bx, by0, R - 17, 0, TAU); c.lineWidth = 13; c.strokeStyle = 'rgba(27,11,58,.13)'; c.stroke();
+      if (m[1] > 0) { c.beginPath(); c.arc(bx, by0, R - 17, -Math.PI / 2, -Math.PI / 2 + TAU * m[1] / 100); c.lineWidth = 13; c.lineCap = 'round'; c.strokeStyle = C.ink; c.stroke(); c.lineCap = 'butt'; }
+      c.font = displayFont(42, 100); c.fillStyle = C.ink; c.textAlign = 'center'; c.direction = 'ltr'; c.textBaseline = 'alphabetic'; c.fillText(m[1] + '%', bx, by0 + 6);
+      c.font = displayFont(m[0].length > 6 ? 11 : 13, 125); c.fillText(m[0], bx, by0 + 30);
+      note(d, m[0], 'text', bx - R, by0 - R, R * 2, R * 2 + 8);
+    });
+    var bxl = M + R * 4 + 24 + 34, bw = CARD_W - M - bxl, bh = 156, bubY = BOTTOM_TOP + 6, bubFill = T.accent;
+    c.fillStyle = side; G.rr(c, bxl, bubY + 9, bw, bh, 40); c.fill(); G.poly(c, [[bxl + 8, bubY + bh - 54], [bxl - 30, bubY + bh - 6], [bxl + 40, bubY + bh - 22]], side);
+    G.poly(c, [[bxl + 8, bubY + bh - 62], [bxl - 28, bubY + bh - 16], [bxl + 40, bubY + bh - 30]], bubFill, side, 10);
+    c.fillStyle = bubFill; G.rr(c, bxl, bubY, bw, bh, 40); c.fill(); c.lineWidth = 5; c.strokeStyle = side; c.stroke();
+    G.poly(c, [[bxl + 10, bubY + bh - 60], [bxl - 22, bubY + bh - 20], [bxl + 38, bubY + bh - 32]], bubFill);
+    var rb = textBlock(c, d, pr.roast, { x: bxl + 28, y: 0, w: bw - 56, size: 30, min: 22, weight: 800, maxLines: 3, dry: true });
+    textBlock(c, d, pr.roast, { x: bxl + 28, y: bubY + (bh - rb.h) / 2 - 2, w: bw - 56, size: 30, min: 22, weight: 800, maxLines: 3, color: C.ink, name: 'roast' });
+    cardFooter(c, d);
+  }
+
+  var LAYOUTS = { type: layoutType, geo: layoutGeo, editorial: layoutEditorial, sticker: layoutSticker };
+  // d: { profile, personality, theme, nick, team, logo, audit? }
+  function drawCard(c, d) {
+    d.dark = d.theme.bg === '#150830';
+    d.side = d.dark ? C.violet : C.ink;          // outline colour for stickers
+    c.save();
+    (LAYOUTS[d.profile.layout] || layoutType)(c, d);
+    c.restore();
   }
 
   /* ------------------------------------------------------------------
-     21. PNG EXPORT + SHARE
+     23. PNG EXPORT + SHARE
      ------------------------------------------------------------------ */
   var card = { canvas: null, dataUrl: '', blob: null, blobUrl: '', file: null, filename: 'hackathon-wrapped.png', token: 0 };
   var logoPromise = null, fontsReady = Promise.resolve();
@@ -1996,13 +2888,19 @@ main { position: relative; z-index: 1; }
     $('cardPreview').classList.add('is-loading');
     $('downloadBtn').disabled = true; $('shareBtn').disabled = true;
   }
-  function buildCard(result) {
+  // Paints one card onto a fresh 1080 × 1920 canvas. `audit`, when given, collects element positions for the development test.
+  function paintCard(profile, nick, team, logo, audit) {
+    var P = PERSONALITIES[profile.id], cv = document.createElement('canvas');
+    cv.width = CARD_W; cv.height = CARD_H;
+    drawCard(cv.getContext('2d'), { profile: profile, personality: P, theme: P.theme, nick: nick, team: team, logo: logo, audit: audit || null });
+    return cv;
+  }
+  function buildCard(profile) {
     resetCard();
-    var token = card.token, P = PERSONALITIES[result.id];
+    var token = card.token, P = PERSONALITIES[profile.id];
     return Promise.all([loadLogo(), fontsReady]).then(function (res) {
       if (token !== card.token) return;                         // a newer result replaced this one
-      var cv = document.createElement('canvas'); cv.width = CARD_W; cv.height = CARD_H;
-      drawCard(cv.getContext('2d'), { personality: { id: result.id, theme: P.theme, titleLines: P.titleLines, tagline: P.tagline, description: P.description, rarity: P.rarity }, nick: state.nick, team: state.team, chaos: result.chaos, creativity: result.creativity, logo: res[0] });
+      var cv = paintCard(profile, state.nick, state.team, res[0]);
       card.canvas = cv;
       card.dataUrl = cv.toDataURL('image/png');
       card.blob = dataUrlToBlob(card.dataUrl);
@@ -2010,7 +2908,7 @@ main { position: relative; z-index: 1; }
       card.filename = 'hackathon-wrapped-' + P.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '.png';
       try { card.file = new File([card.blob], card.filename, { type: 'image/png' }); } catch (e) { card.file = null; }
       var img = $('cardImg');
-      img.alt = 'Wrapped card: ' + state.nick + ' is ' + P.title + '. Chaos level ' + result.chaos + '%, creativity level ' + result.creativity + '%.';
+      img.alt = 'Wrapped card: ' + state.nick + ' is ' + P.title + ', ' + profile.edition + '. Chaos level ' + profile.chaos + '%, creativity level ' + profile.creativity + '%.';
       img.src = card.dataUrl; img.hidden = false;
       $('cardPreview').classList.remove('is-loading');
       $('downloadBtn').disabled = false; $('shareBtn').disabled = false;
@@ -2055,7 +2953,7 @@ main { position: relative; z-index: 1; }
   }
 
   /* ------------------------------------------------------------------
-     22. SMALL THINGS: mute button, logo easter egg, marquee
+     24. SMALL THINGS: mute button, logo easter egg, marquee
      ------------------------------------------------------------------ */
   function syncMute() {
     var b = $('muteBtn');
@@ -2069,10 +2967,12 @@ main { position: relative; z-index: 1; }
     });
     syncMute();
 
-    var logo = $('logoImg');
-    logo.addEventListener('error', function () { if (ASSETS && logo.src !== ASSETS.logo) logo.src = ASSETS.logo; });
-    if (LOGO_SRC !== 'assets/tafa3ul-logo.png') logo.src = LOGO_SRC;
-    if (logo.complete && !logo.naturalWidth && ASSETS) logo.src = ASSETS.logo;
+    // Every copy of the logo on the page uses the same file, with the embedded copy as a safety net.
+    Array.prototype.forEach.call(document.querySelectorAll('img[data-logo]'), function (logo) {
+      logo.addEventListener('error', function () { if (ASSETS && logo.src !== ASSETS.logo) logo.src = ASSETS.logo; });
+      if (LOGO_SRC !== 'assets/tafa3ul-logo.png') logo.src = LOGO_SRC;
+      if (logo.complete && !logo.naturalWidth && ASSETS) logo.src = ASSETS.logo;
+    });
 
     // Easter egg: five quick taps on the logo.
     var taps = 0, tapTimer = 0, chip = $('logoChip');
@@ -2124,41 +3024,128 @@ main { position: relative; z-index: 1; }
   }
 
   /* ------------------------------------------------------------------
-     23. DEVELOPMENT TEST (never runs for employees)
-     Run HackathonWrapped.test() in the console, or open the page with
-     ?hwtest=1. It tries all 1,024 answer combinations and reports to the
-     console only.
+     25. DEVELOPMENT TESTS (never run for employees)
+     HackathonWrapped.test()   scoring + personalisation, all 1,048,576
+                               answer combinations. Console only. Also
+                               runs when the page is opened with ?hwtest=1
+     HackathonWrapped.audit()  draws every personality in every layout
+                               with short, long and Arabic names and checks
+                               that no element overlaps another or leaves
+                               the card, and that no emblem is cut off.
      ------------------------------------------------------------------ */
   function runSelfTest() {
-    var counts = {}, chaos = {}, crea = {}, ties = 0, deterministic = true, total = 0;
-    PERSONALITY_ORDER.forEach(function (id) { counts[id] = 0; chaos[id] = []; crea[id] = []; });
-    var n = QUESTIONS.length, combos = Math.pow(4, n);
+    var n = QUESTIONS.length, combos = Math.pow(4, n), counts = {}, chaosRange = {}, creaRange = {}, ties = 0, deterministic = true, receiptsOk = true, backedUp = true;
+    var seenChaos = {}, seenCrea = {}, a = new Array(n);
+    PERSONALITY_ORDER.forEach(function (id) { counts[id] = 0; chaosRange[id] = [100, 0]; creaRange[id] = [100, 0]; });
+    // Personalisation is sampled (every 211th combination) to keep this quick.
+    var sample = {}, sampleN = 0, signatures = {};
+    PERSONALITY_ORDER.forEach(function (id) { sample[id] = { n: 0, layout: {}, edition: {}, roast: {}, intro: {}, receipt: {}, combos: {} }; });
     for (var i = 0; i < combos; i++) {
-      var a = [], v = i; for (var q = 0; q < n; q++) { a.unshift(v % 4); v = Math.floor(v / 4); }
-      var r1 = computeResult(a), r2 = computeResult(a.slice());
-      if (r1.id !== r2.id || r1.chaos !== r2.chaos || r1.creativity !== r2.creativity) deterministic = false;
-      var top = Object.keys(r1.scores).map(function (k) { return r1.scores[k]; }).sort(function (x, y) { return y - x; });
-      if (Math.abs(top[0] - top[1]) < 1e-9) ties++;
-      counts[r1.id]++; chaos[r1.id].push(r1.chaos); crea[r1.id].push(r1.creativity); total++;
+      var v = i; for (var q = n - 1; q >= 0; q--) { a[q] = v & 3; v = v >> 2; }
+      var r = computeResult(a);
+      counts[r.id]++; seenChaos[r.chaos] = 1; seenCrea[r.creativity] = 1;
+      if (r.chaos < chaosRange[r.id][0]) chaosRange[r.id][0] = r.chaos; if (r.chaos > chaosRange[r.id][1]) chaosRange[r.id][1] = r.chaos;
+      if (r.creativity < creaRange[r.id][0]) creaRange[r.id][0] = r.creativity; if (r.creativity > creaRange[r.id][1]) creaRange[r.id][1] = r.creativity;
+      var top = -Infinity, second = -Infinity;
+      PERSONALITY_ORDER.forEach(function (id) { var s = r.scores[id]; if (s > top) { second = top; top = s; } else if (s > second) second = s; });
+      if (top - second < 1e-9) ties++;
+      if (i % 211 === 0) {
+        var p1 = buildProfile(a), p2 = buildProfile(a.slice()), sig = [p1.id, p1.edition, p1.intro, p1.receipts.join('|'), p1.roast, p1.layout, p1.label, p1.weaknessPlus].join('~');
+        if (sig !== [p2.id, p2.edition, p2.intro, p2.receipts.join('|'), p2.roast, p2.layout, p2.label, p2.weaknessPlus].join('~') || p1.id !== r.id || p1.chaos !== r.chaos) deterministic = false;
+        // Every receipt must be a line attached to an answer this person actually gave.
+        p1.receipts.forEach(function (line) { var ok = false; for (var k = 0; k < n; k++) if (QUESTIONS[k].answers[a[k]].receipt === line) ok = true; if (!ok) receiptsOk = false; });
+        // The secondary trait must be one they really scored on, and the roasted trait one they really scored low on (or their lowest).
+        var others = TRAIT_KEYS.filter(function (k) { return k !== PERSONALITIES[p1.id].signature && k !== p1.secondary; });
+        var lowest = Math.min.apply(null, others.map(function (k) { return p1.traits[k]; }));
+        if (!(p1.traits[p1.secondary] > 0) || !(p1.traits[p1.weakest] <= 0.2 || p1.traits[p1.weakest] === lowest) || p1.secondary === p1.weakest) backedUp = false;
+        var s = sample[p1.id]; s.n++; sampleN++;
+        s.layout[p1.layout] = (s.layout[p1.layout] || 0) + 1; s.edition[p1.edition] = 1; s.roast[p1.roast] = 1; s.intro[p1.intro] = 1; s.receipt[p1.receipts[0]] = 1; s.combos[sig] = 1;
+        signatures[sig] = (signatures[sig] || 0) + 1;
+      }
     }
-    var range = function (arr) { return arr.length ? Math.min.apply(null, arr) + '–' + Math.max.apply(null, arr) : 'n/a'; };
+    var size = function (o) { return Object.keys(o).length; };
     var table = PERSONALITY_ORDER.map(function (id) {
-      return { personality: PERSONALITIES[id].title, combinations: counts[id], share: (counts[id] / total * 100).toFixed(1) + '%', chaos: range(chaos[id]), creativity: range(crea[id]) };
+      var s = sample[id];
+      return {
+        personality: PERSONALITIES[id].title, share: (counts[id] / combos * 100).toFixed(1) + '%',
+        chaos: chaosRange[id].join('–'), creativity: creaRange[id].join('–'),
+        layouts: LAYOUT_ORDER.map(function (k) { return k + ' ' + Math.round((s.layout[k] || 0) / Math.max(1, s.n) * 100) + '%'; }).join(', '),
+        editions: size(s.edition), intros: size(s.intro), receipts: size(s.receipt), roasts: size(s.roast), distinctResults: size(s.combos) + ' of ' + s.n
+      };
     });
-    var structureOk = QUESTIONS.length === 5 && QUESTIONS.every(function (q) { return q.answers.length === 4; });
+    var structureOk = QUESTIONS.length === 10 && QUESTIONS.every(function (q) { return q.answers.length === 4 && q.answers.every(function (x) { return x.text && x.receipt && size(x.traits) > 0; }); });
     var allReachable = PERSONALITY_ORDER.every(function (id) { return counts[id] > 0; });
-    var all = function (o) { return PERSONALITY_ORDER.reduce(function (acc, id) { return acc.concat(o[id]); }, []); };
-    var distinct = function (arr) { var seen = {}; arr.forEach(function (v) { seen[v] = 1; }); return Object.keys(seen).length; };
-    var report = { structureOk: structureOk, allReachable: allReachable, deterministic: deterministic, exactTies: ties, combinations: total, distinctChaosValues: distinct(all(chaos)), distinctCreativityValues: distinct(all(crea)), table: table, pass: structureOk && allReachable && deterministic };
+    var layoutsUsed = PERSONALITY_ORDER.every(function (id) { return LAYOUT_ORDER.every(function (k) { return sample[id].layout[k] > 0; }); });
+    var report = {
+      structureOk: structureOk, allReachable: allReachable, deterministic: deterministic, receiptsFromOwnAnswers: receiptsOk, linesBackedByAnswers: backedUp, exactTies: ties, combinations: combos,
+      distinctChaosValues: size(seenChaos), distinctCreativityValues: size(seenCrea),
+      sampledProfiles: sampleN, distinctProfiles: size(signatures), everyLayoutForEveryPersonality: layoutsUsed, table: table,
+      pass: structureOk && allReachable && deterministic && receiptsOk && backedUp && layoutsUsed
+    };
     if (window.console) {
       if (console.table) console.table(table);
-      console.log('[Hackathon Wrapped self-test] ' + (report.pass ? 'PASS' : 'FAIL') + ' | 5×4 structure: ' + structureOk + ' | all 8 reachable: ' + allReachable + ' | deterministic: ' + deterministic + ' | exact ties: ' + ties + ' | distinct chaos / creativity values: ' + report.distinctChaosValues + ' / ' + report.distinctCreativityValues);
+      console.log('[Hackathon Wrapped self-test] ' + (report.pass ? 'PASS' : 'FAIL') + ' | 10×4 structure: ' + structureOk + ' | all 8 reachable: ' + allReachable + ' | deterministic: ' + deterministic +
+        ' | receipts come from own answers: ' + receiptsOk + ' | lines backed by answers: ' + backedUp + ' | exact ties: ' + ties + ' | distinct personalised results: ' + report.distinctProfiles + ' of ' + sampleN + ' sampled | every layout reachable for every personality: ' + layoutsUsed);
     }
     return report;
   }
 
+  // A fixed answer set that produces the given personality (and layout, when asked). Development only.
+  function findAnswers(id, layout) {
+    var n = QUESTIONS.length, seed = 7, a, tries = 0;
+    var next = function () { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed; };
+    while (tries++ < 200000) {
+      a = QUESTIONS.map(function () { return (next() >>> 16) & 3; });
+      var p = buildProfile(a);
+      if (p.id === id && (!layout || p.layout === layout)) return a;
+    }
+    return null;
+  }
+
+  function runCardAudit() {
+    var problems = [], checked = 0;
+    // 1. Emblems must stay inside their square.
+    PERSONALITY_ORDER.forEach(function (id) {
+      var S = 760, cv = document.createElement('canvas'); cv.width = S; cv.height = S;
+      var c = cv.getContext('2d'); drawEmblem(c, id, PERSONALITIES[id].theme, S / 2, S / 2, 1, PERSONALITIES[id].theme.bg);
+      var px = c.getImageData(0, 0, S, S).data, minX = S, minY = S, maxX = 0, maxY = 0;
+      for (var y = 0; y < S; y++) for (var x = 0; x < S; x++) if (px[(y * S + x) * 4 + 3] > 8) { if (x < minX) minX = x; if (x > maxX) maxX = x; if (y < minY) minY = y; if (y > maxY) maxY = y; }
+      var lo = S / 2 - EMBLEM_R, hi = S / 2 + EMBLEM_R;
+      if (minX < lo || minY < lo || maxX > hi || maxY > hi) problems.push('emblem ' + id + ' leaves its square: ' + [minX - S / 2, minY - S / 2, maxX - S / 2, maxY - S / 2].join(','));
+    });
+    // 2. Every personality × layout × name length: nothing overlaps, nothing leaves the safe area.
+    var people = [['Lu', ''], ['WWWWWWWWWWWWWWWWWW', 'MMMMMMMMMMMMMMMMMMMMMMMM'], ['عبدالرحمن الكبير', 'فريق الإبداع والطوارئ'], ['Yasmin Al-Baghdadi', 'Team 404']];
+    return Promise.all([loadLogo(), fontsReady]).then(function (res) {
+      PERSONALITY_ORDER.forEach(function (id) {
+        LAYOUT_ORDER.forEach(function (layout) {
+          var answers = findAnswers(id, layout);
+          if (!answers) { problems.push('no answers found for ' + id + ' / ' + layout); return; }
+          people.forEach(function (who) {
+            var boxes = [], profile = buildProfile(answers);
+            paintCard(profile, who[0], who[1], res[0], boxes); checked++;
+            boxes.forEach(function (b, i) {
+              var tag = id + ' / ' + layout + ' / "' + who[0] + '": ' + b.name;
+              if (b.kind === 'fit') { if (b.w > b.h + 1) problems.push(tag + ' is wider than its container (' + b.w + ' > ' + b.h + ')'); return; }
+              if (b.x < 0 || b.y < 0 || b.x + b.w > CARD_W || b.y + b.h > CARD_H) problems.push(tag + ' leaves the card');
+              else if ((b.kind === 'text' || b.kind === 'brand') && (b.x < 40 || b.x + b.w > CARD_W - 40 || b.y < 170 || b.y + b.h > 1880)) problems.push(tag + ' leaves the safe area (' + [b.x, b.y, b.w, b.h].join(',') + ')');
+              for (var j = i + 1; j < boxes.length; j++) {
+                var o = boxes[j];
+                if (o.kind === 'fit' || (b.kind === 'brand' && o.kind === 'brand')) continue;
+                var hit = b.x < o.x + o.w && o.x < b.x + b.w && b.y < o.y + o.h && o.y < b.y + b.h;
+                if (hit) problems.push(tag + ' overlaps ' + o.name + ' (' + [b.x, b.y, b.w, b.h].join(',') + ' vs ' + [o.x, o.y, o.w, o.h].join(',') + ')');
+              }
+            });
+          });
+        });
+      });
+      var report = { cardsChecked: checked, problems: problems, pass: problems.length === 0 };
+      if (window.console) console.log('[Hackathon Wrapped card audit] ' + (report.pass ? 'PASS' : 'FAIL') + ' | ' + checked + ' cards checked | ' + problems.length + ' problems' + (problems.length ? '\n' + problems.slice(0, 40).join('\n') : ''));
+      return report;
+    });
+  }
+
   /* ------------------------------------------------------------------
-     24. BOOT
+     26. BOOT
      ------------------------------------------------------------------ */
   function registerFonts() {
     if (!window.FontFace || !document.fonts || !ASSETS) return Promise.resolve();
@@ -2190,6 +3177,7 @@ main { position: relative; z-index: 1; }
     load();
     Array.prototype.forEach.call(document.querySelectorAll('.screen'), function (s) { screens[s.getAttribute('data-screen')] = s; s.hidden = true; });
     publishColours();
+    publishMotif();
     initShapes();
     var fontsDone = false, timeout = new Promise(function (r) { setTimeout(r, 2500); });
     fontsReady = registerFonts().then(function () { fontsDone = true; });
@@ -2201,26 +3189,41 @@ main { position: relative; z-index: 1; }
       });
       initChrome(); initIntro(); initQuiz();
       var start = state.savedScreen;
-      if (start === 'result' && state.nick && allAnswered()) {
-        state.result = computeResult(state.answers);
+      if (start === 'result' && state.nick && state.order && allAnswered()) {
+        state.result = buildProfile(state.answers);
         renderResult(state.result);
         show('result', { instant: true, theme: PERSONALITIES[state.result.id].theme, focus: false, onShown: function () { fitLockup($('rTitle'), false); animateMeters(state.result, false); } });
-      } else if ((start === 'quiz' || start === 'reveal' || start === 'result') && state.nick) {
-        state.q = Math.min(state.q, firstUnanswered());
+      } else if ((start === 'quiz' || start === 'reveal' || start === 'result') && state.nick && state.order) {
+        state.pos = Math.min(state.pos, firstUnansweredPos());
         renderQuestion(false);
-        show('quiz', { instant: true, scene: 'q' + state.q, focus: false });
+        show('quiz', { instant: true, scene: sceneFor(state.pos), focus: false });
       } else if (start === 'intro') {
         show('intro', { instant: true, focus: false });
       } else {
         show('landing', { instant: true, focus: false, onShown: Kinetic.start });
       }
       document.documentElement.classList.remove('is-booting');
+      setTimeout(getTypeBaseline, 1200);                       // warm up the personalisation baseline while the visitor reads
       if (/[?&]hwtest=1/.test(location.search)) runSelfTest();
     });
   }
 
-  // Public handle: boot() is called by the assets script; test() is for developers.
-  window.HackathonWrapped = { boot: boot, test: runSelfTest, score: computeResult };
+  // Public handle: boot() is called by the assets script; the rest is for developers.
+  window.HackathonWrapped = {
+    boot: boot, test: runSelfTest, audit: runCardAudit, score: computeResult, profile: buildProfile,
+    dev: {
+      findAnswers: findAnswers,
+      order: function () { return state.order ? state.order.slice() : null; },
+      shuffle: function () { return shuffledOrder(); },
+      // Renders a card for any answers / name without touching the page: resolves to a PNG data URL.
+      card: function (answers, nick, team, layout) {
+        return Promise.all([loadLogo(), fontsReady]).then(function (res) {
+          var p = buildProfile(answers); if (layout) p.layout = layout;
+          return paintCard(p, nick || 'Huda', team || '', res[0]).toDataURL('image/png');
+        });
+      }
+    }
+  };
 })();
 </script>
 
